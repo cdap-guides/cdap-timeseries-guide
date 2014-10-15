@@ -103,9 +103,15 @@ The application is identified by the TrafficApp class.  This class extends Abstr
     }
   }
 
-When it comes to handling time-based events, we need a place to receive and process the events themselves.  CDAP provides a real-time stream processing system that is a great match for handling event streams.  So, first, our TrafficApp adds a new Stream.
+When it comes to handling time-based events, we need a place to receive and process the events themselves. 
+CDAP provides a real-time stream processing system that is a great match for handling event streams. 
+So, first, our TrafficApp adds a new Stream.
 
-We also need a place to store the traffic event records that we receive, so, TrafficApp next creates a Dataset to store the processed data.  TrafficApp uses a CounterTimeseriesTable, which orders data by a key, plus timestamp.  This makes it possible to efficiently query out the reported values for a given time range.
+We also need a place to store the traffic event records that we receive, so, TrafficApp next 
+creates a Dataset to store the processed data.  TrafficApp uses a 
+`CounterTimeseriesTable <http://docs.cdap.io/cdap/2.5.0/en/javadocs/co/cask/cdap/api/dataset/lib/CounterTimeseriesTable.html>`_, 
+which orders data by a key, plus timestamp.  This makes it possible to efficiently query out the reported 
+values for a given time range.
 
 Finally, TrafficApp adds a Flow to process data from the Stream, and a Service to query the traffic events that have been processed and stored.
 
@@ -130,7 +136,11 @@ The incoming traffic events are processed in two phases, defined in the TrafficF
     }
   }
 
-TrafficFlow first registers the two `Flowlets <http://docs.cdap.io/cdap/current/en/dev-guide.html#flowlets>`_ to be used in the specification, then connects the registered Flowlets into a processing pipeline.  The first Flowlet, TrafficEventParser, reads raw events from the stream, parses and validates the individual fields, and emits the structured event objects.   The second, TrafficEventSink, receives the structured events from TrafficEventParser, and stores them to the CounterTimeseriesTable Dataset.
+TrafficFlow first registers the two `Flowlets <http://docs.cdap.io/cdap/current/en/dev-guide.html#flowlets>`_ 
+to be used in the specification, then connects the registered Flowlets into a processing pipeline.  
+The first Flowlet, TrafficEventParser, reads raw events from the stream, parses and validates the individual fields,
+and emits the structured event objects.   The second, TrafficEventSink, receives the structured events from 
+TrafficEventParser, and stores them to the CounterTimeseriesTable Dataset.
 
 First, let’s look at TrafficEventParser in more detail:
 
