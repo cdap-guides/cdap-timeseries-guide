@@ -70,7 +70,7 @@ Implementation
 The first step is to get our application structure set up.  We will use a standard Maven project structure for all of the source code files::
 
   ./pom.xml
-  ./README.md
+  ./README.rst
   ./src/main/java/co/cask/cdap/guides/traffic/TrafficApp.java
   ./src/main/java/co/cask/cdap/guides/traffic/TrafficConditionService.java
   ./src/main/java/co/cask/cdap/guides/traffic/TrafficEvent.java
