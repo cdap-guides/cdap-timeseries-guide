@@ -31,9 +31,11 @@ Application Design
 For this guide, we will assume that we are processing events from a sensor network of traffic monitors.  Each traffic monitor covers a given road segment and provides periodic reports of the number of passing vehicles, and a count of any traffic accidents that have occurred.
 
 Sensors report in from the network by sending event records containing the following fields:
+
 * road_segment_id: LONG - unique identifier for the road segment
 * timestamp: "YYYY-MM-DD hh:mm:ss" formatted  timestamp
 * event_type:
+
   * VEHICLE - indicates a count of vehicles passing the sensor since the last report
   * ACCIDENT - indicates a count of traffic accidents since the last report
   * count: INT
@@ -283,7 +285,7 @@ The TrafficApp application can be built and packaged using standard Apache Maven
 
   mvn clean package
 
-Note that the remaining commands assume that the cdap-cli.sh script is available on your PATH. If this is not the case, please add it:
+Note that the remaining commands assume that the cdap-cli.sh script is available on your PATH. If this is not the case, please add it::
 
   export PATH=$PATH:<CDAP home>/bin
 
