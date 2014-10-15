@@ -14,6 +14,7 @@ This guide will take you through building a simple
 sensor network of traffic monitors, aggregate the event counts into a traffic volume per road segment,
 and query the traffic volume over a time period to produce a traffic condition report. You will:
 
+* use a `Stream <http://docs.cdap.io/cdap/current/en/dev-guide.html#streams>`_ to ingest real-time events data
 * build a `Flow <http://docs.cdap.io/cdap/current/en/dev-guide.html#flows>`_ to process events as they are received, 
   and count by road segment and event type
 * use a `Dataset <http://docs.cdap.io/cdap/current/en/dev-guide.html#datasets>`_ to store the event data
@@ -79,7 +80,9 @@ The first step is to get our application structure set up.  We will use a standa
   ./src/test/java/co/cask/cdap/guides/traffic/TrafficAppTest.java
 
 
-The application is identified by the TrafficApp class.  This class extends AbstractApplication, and overrides the configure() method in order to define all of the application components:
+The application is identified by the TrafficApp class.  This class extends 
+`AbstractApplication <http://docs.cdap.io/cdap/2.5.0/en/javadocs/co/cask/cdap/api/app/AbstractApplication.html>`_,
+and overrides the configure() method in order to define all of the application components:
 
 .. code:: java
 
@@ -106,8 +109,9 @@ The application is identified by the TrafficApp class.  This class extends Abstr
   }
 
 When it comes to handling time-based events, we need a place to receive and process the events themselves. 
-CDAP provides a real-time stream processing system that is a great match for handling event streams. 
-So, first, our TrafficApp adds a new Stream.
+CDAP provides a `real-time stream processing system <http://docs.cdap.io/cdap/current/en/dev-guide.html#flows>`_ 
+that is a great match for handling event streams. So, first, our TrafficApp adds a new 
+`Stream <http://docs.cdap.io/cdap/current/en/dev-guide.html#streams>`_.
 
 We also need a place to store the traffic event records that we receive, so, TrafficApp next 
 creates a Dataset to store the processed data.  TrafficApp uses a 
