@@ -4,7 +4,7 @@ Storing Timeseries Data
 The Cask Data Application Platform (CDAP) provides a number of pre-packaged Datasets, which make it easy to store and retrieve data using best-practices based implementations of common data access patterns.  In this guide, you will learn how to process and store timeseries data, using the example of real-time sensor data from a traffic monitor network.
 
 What You Will Build
-===================
+-------------------
 
 This guide will take you through building a simple CDAP application to ingest data from a sensor network of traffic monitors, aggregate the event counts into a traffic volume per road segment, and query the traffic volume over a time period to produce a traffic condition report.
 
@@ -14,19 +14,19 @@ You will:
 * build a Service to retrieve the event counts by time range
 
 What You Will Need
-==================
+------------------
 
 * JDK 6 or JDK 7
 * Apache Maven 3.0+
 * CDAP SDK <link to installation guide>
 
 Let’s Build It!
-===============
+---------------
 
 Following sections will guide you through building an application from scratch. If you are interested in deploying and running the application right away, you can download its source code and binaries from here <link>. In that case feel free to skip the next two sections and jump right to Build & Run section.
 
 Application Design
-------------------
+~~~~~~~~~~~~~~~~~~
 
 For this guide, we will assume that we are processing events from a sensor network of traffic monitors.  Each traffic monitor covers a given road segment and provides periodic reports of the number of passing vehicles, and a count of any traffic accidents that have occurred.
 
@@ -52,7 +52,7 @@ In addition to storing the sensor data as a timeseries, we also want to query th
 
 
 Implementation
---------------
+~~~~~~~~~~~~~~
 
 The first step is to get our application structure set up.  We will use a standard Maven project structure for all of the source code files::
 
