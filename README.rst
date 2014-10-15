@@ -88,7 +88,7 @@ and overrides the configure() method in order to define all of the application c
 
   public class TrafficApp extends AbstractApplication {
     static final String APP_NAME = "TrafficApp";
-    static final String STREAM_NAME = "trafficStream";
+    static final String STREAM_NAME = "trafficEvents";
     static final String TIMESERIES_TABLE_NAME = "trafficEventTable";   
   
     public static final int TIMESERIES_INTERVAL = 15 * 60 * 1000; // 15 minutes 
@@ -342,9 +342,9 @@ We can then deploy the application to a standalone CDAP installation::
 
 Next, we will send some sample records into the stream for processing::
 
-  cdap-cli.sh send stream TrafficStream "1N1, now, VEHICLE, 10"
-  cdap-cli.sh send stream TrafficStream "1N2, now, VEHICLE, 101"
-  cdap-cli.sh send stream TrafficStream "1N3, now, ACCIDENT, 1"
+  cdap-cli.sh send stream trafficEvents "1N1, now, VEHICLE, 10"
+  cdap-cli.sh send stream trafficEvents "1N2, now, VEHICLE, 101"
+  cdap-cli.sh send stream trafficEvents "1N3, now, ACCIDENT, 1"
 
 We can now start the TrafficConditions service and check the service calls::
 
