@@ -13,9 +13,11 @@ This guide will take you through building a simple CDAP application to ingest da
 sensor network of traffic monitors, aggregate the event counts into a traffic volume per road segment,
 and query the traffic volume over a time period to produce a traffic condition report. You will:
 
-* build a Flow to process events as they are received, and count by road segment and event type
-* use a Dataset to store the event data
-* build a Service to retrieve the event counts by time range
+* build a `Flow <http://docs.cdap.io/cdap/current/en/dev-guide.html#flows>`_ to process events as they are received, 
+and count by road segment and event type
+* use a `Dataset <http://docs.cdap.io/cdap/current/en/dev-guide.html#datasets>`_ to store the event data
+* build a `Service <http://docs.cdap.io/cdap/current/en/dev-guide.html#services>`_ to retrieve the event counts by 
+time range
 
 What You Will Need
 ------------------
@@ -81,8 +83,8 @@ The application is identified by the TrafficApp class.  This class extends Abstr
 .. code:: java
   public class TrafficApp extends AbstractApplication {
     static final String APP_NAME = "TrafficApp";
-    static final String STREAM_NAME = "TrafficStream";
-    static final String TIMESERIES_TABLE_NAME = "TrafficEventTable";   
+    static final String STREAM_NAME = "trafficStream";
+    static final String TIMESERIES_TABLE_NAME = "trafficEventTable";   
   
     public static final int TIMESERIES_INTERVAL = 15 * 60 * 1000; // 15 minutes 
   
@@ -128,7 +130,7 @@ The incoming traffic events are processed in two phases, defined in the TrafficF
     }
   }
 
-TrafficFlow first registers the two Flowlets to be used in the specification, then connects the registered Flowlets into a processing pipeline.  The first Flowlet, TrafficEventParser, reads raw events from the stream, parses and validates the individual fields, and emits the structured event objects.   The second, TrafficEventSink, receives the structured events from TrafficEventParser, and stores them to the CounterTimeseriesTable Dataset.
+TrafficFlow first registers the two `Flowlets <http://docs.cdap.io/cdap/current/en/dev-guide.html#flowlets>`_ to be used in the specification, then connects the registered Flowlets into a processing pipeline.  The first Flowlet, TrafficEventParser, reads raw events from the stream, parses and validates the individual fields, and emits the structured event objects.   The second, TrafficEventSink, receives the structured events from TrafficEventParser, and stores them to the CounterTimeseriesTable Dataset.
 
 First, let’s look at TrafficEventParser in more detail:
 
@@ -181,11 +183,15 @@ First, let’s look at TrafficEventParser in more detail:
     }
   }
 
-The process() method is annotated with @ProcessInput, telling CDAP that this method should be invoked for incoming events.  Since TrafficEventParser is connected to the Stream, it receives events of type StreamEvent.  Each StreamEvent contains a request body with the raw input data, which we expect in the format::
+The process() method is annotated with @ProcessInput, telling CDAP that this method should be invoked for 
+incoming events.  Since TrafficEventParser is connected to the Stream, it receives events of type StreamEvent.  
+Each StreamEvent contains a request body with the raw input data, which we expect in the format::
 
   <road segment ID>, <timestamp>, <type>, <count>
 
-The process() method validates each field for the correct type, constructs a new TrafficEvent object, and emits the object to any downstream Flowlets using the defined OutputEmitter instance (<link to Flowlet documentation>).
+The process() method validates each field for the correct type, constructs a new TrafficEvent object, 
+and emits the object to any downstream Flowlets using the defined OutputEmitter instance
+(<link to Flowlet documentation>).
 
 The next step in the pipeline is the TrafficEventSink Flowlet:
 
