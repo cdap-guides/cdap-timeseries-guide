@@ -9,7 +9,8 @@ using the example of real-time sensor data from a traffic monitor network.
 What You Will Build
 -------------------
 
-This guide will take you through building a simple CDAP application to ingest data from a 
+This guide will take you through building a simple 
+`CDAP application <http://docs.cdap.io/cdap/current/en/dev-guide.html#applications>`_ to ingest data from a 
 sensor network of traffic monitors, aggregate the event counts into a traffic volume per road segment,
 and query the traffic volume over a time period to produce a traffic condition report. You will:
 
