@@ -83,7 +83,7 @@ public class TrafficAppTest extends TestBase {
       sendRecord(streamWriter, segment4, now, TrafficEvent.Type.VEHICLE, 10);
 
       // Wait until all stream events have been processed by the TrafficEventStore Flowlet
-      RuntimeMetrics metrics = RuntimeStats.getFlowletMetrics(TrafficApp.APP_NAME, TrafficFlow.FLOW_NAME, "store");
+      RuntimeMetrics metrics = RuntimeStats.getFlowletMetrics(TrafficApp.APP_NAME, TrafficFlow.FLOW_NAME, "sink");
       metrics.waitForProcessed(streamEventCount, 5, TimeUnit.SECONDS);
 
       ServiceManager serviceManager = appManager.startService(TrafficConditionService.SERVICE_NAME);

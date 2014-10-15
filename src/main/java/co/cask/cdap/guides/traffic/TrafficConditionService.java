@@ -56,7 +56,7 @@ public class TrafficConditionService extends AbstractService {
     private static final int CONGESTED_THRESHOLD = 100;
 
     /** How far to look back for the traffic patterns */
-    private static final long lookbackPeriod = TrafficApp.TIMESERIES_INTERVAL * 3;
+    private static final long LOOKBACK_PERIOD = TrafficApp.TIMESERIES_INTERVAL * 3;
 
     @UseDataSet(TrafficApp.TIMESERIES_TABLE_NAME)
     private CounterTimeseriesTable table;
@@ -65,7 +65,7 @@ public class TrafficConditionService extends AbstractService {
      * Service method that determines a {@link co.cask.cdap.guides.traffic.TrafficConditionService.Condition}
      * corresponding to a given road segment for the most recent timeseries intervals:
      * <ul>
-     *   <li>if the total number of traffic accidents is greater than 1, return RED;</li>
+     *   <li>if any traffic accidents were reported, return RED;</li>
      *   <li>if 2+ vehicle count reports are greater than the threshold, return RED;</li>
      *   <li>if 1 vehicle count report is greater than the threshold, return YELLOW;</li>
      *   <li>otherwise, return GREEN.</li>
@@ -75,34 +75,21 @@ public class TrafficConditionService extends AbstractService {
     @GET
     public void recentConditions(HttpServiceRequest request, HttpServiceResponder responder,
                         @PathParam("segment") String segmentId) {
-
       long endTime = System.currentTimeMillis();
-      long startTime = endTime - lookbackPeriod;
-
-      byte[] roadSegmentId = Bytes.toBytes(segmentId);
-      long accidentCount = 0;
-      int congestedCount = 0;
-
-      Iterator<CounterTimeseriesTable.Counter> accidentEvents =
-        table.read(roadSegmentId, startTime, endTime, Bytes.toBytes(TrafficEvent.Type.ACCIDENT.name()));
-      while (accidentEvents.hasNext()) {
-        accidentCount += accidentEvents.next().getValue();
-      }
+      long startTime = endTime - LOOKBACK_PERIOD;
 
       Condition currentCondition = Condition.GREEN;
-      if (accidentCount > 0) {
+      int accidentEntries =
+        getCountsExceeding(segmentId, startTime, endTime, TrafficEvent.Type.ACCIDENT, 0);
+      if (accidentEntries > 0) {
         currentCondition = Condition.RED;
       } else {
-        Iterator<CounterTimeseriesTable.Counter> vehicleEvents =
-          table.read(roadSegmentId, startTime, endTime, Bytes.toBytes(TrafficEvent.Type.VEHICLE.name()));
-        while (vehicleEvents.hasNext()) {
-          if (vehicleEvents.next().getValue() > CONGESTED_THRESHOLD) {
-            congestedCount++;
-          }
-        }
-        if (congestedCount > 1) {
+        int congestedEntries =
+          getCountsExceeding(segmentId, startTime, endTime,
+                             TrafficEvent.Type.VEHICLE, CONGESTED_THRESHOLD);
+        if (congestedEntries > 1) {
           currentCondition = Condition.RED;
-        } else if (congestedCount > 0) {
+        } else if (congestedEntries > 0) {
           currentCondition = Condition.YELLOW;
         }
       }
@@ -110,43 +97,19 @@ public class TrafficConditionService extends AbstractService {
     }
 
     /**
-     * Service method that returns the total of all vehicle counts reported over the recent timeseries records.
+     * Returns the number of counter entries with a value exceeding the given threshold.
      */
-    @Path("road/{segment}/vehicles")
-    @GET
-    public void vehicleCount(HttpServiceRequest request, HttpServiceResponder responder,
-                        @PathParam("segment") String segmentId) {
-      long endTime = System.currentTimeMillis();
-      long startTime = endTime - lookbackPeriod;
-
-      byte[] roadSegmentId = Bytes.toBytes(segmentId);
-      long totalCount = 0;
-      Iterator<CounterTimeseriesTable.Counter> events = table.read(roadSegmentId, startTime, endTime,
-                                                                   Bytes.toBytes(TrafficEvent.Type.VEHICLE.name()));
+    private int getCountsExceeding(String roadSegmentId, long startTime, long endTime,
+                                   TrafficEvent.Type type, long threshold) {
+      int count = 0;
+      Iterator<CounterTimeseriesTable.Counter> events =
+        table.read(Bytes.toBytes(roadSegmentId), startTime, endTime, Bytes.toBytes(type.name()));
       while (events.hasNext()) {
-        totalCount += events.next().getValue();
+        if (events.next().getValue() > threshold) {
+          count++;
+        }
       }
-      responder.sendString(Long.toString(totalCount));
-    }
-
-    /**
-     * Service method that returns the total of all accident counts reported over the recent timeseries records.
-     */
-    @Path("road/{segment}/accidents")
-    @GET
-    public void accidentCount(HttpServiceRequest request, HttpServiceResponder responder,
-                             @PathParam("segment") String segmentId) {
-      long endTime = System.currentTimeMillis();
-      long startTime = endTime - lookbackPeriod;
-
-      byte[] roadSegmentId = Bytes.toBytes(segmentId);
-      long totalCount = 0;
-      Iterator<CounterTimeseriesTable.Counter> events = table.read(roadSegmentId, startTime, endTime,
-                                                                   Bytes.toBytes(TrafficEvent.Type.ACCIDENT.name()));
-      while (events.hasNext()) {
-        totalCount += events.next().getValue();
-      }
-      responder.sendString(Long.toString(totalCount));
+      return count;
     }
   }
 }

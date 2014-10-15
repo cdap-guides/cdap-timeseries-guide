@@ -27,8 +27,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Increments timeseries counts for received {@link TrafficEvent}s per road segment ID and type.
  */
-public class TrafficEventStore extends AbstractFlowlet {
-  private static final Logger LOG = LoggerFactory.getLogger(TrafficEventStore.class);
+public class TrafficEventSink extends AbstractFlowlet {
+  private static final Logger LOG = LoggerFactory.getLogger(TrafficEventSink.class);
 
   @UseDataSet(TrafficApp.TIMESERIES_TABLE_NAME)
   private CounterTimeseriesTable table;

@@ -32,10 +32,10 @@ public class TrafficFlow implements Flow {
       .setDescription("Reads traffic events from a stream and persists to a timeseries dataset")
       .withFlowlets()
         .add("parser", new TrafficEventParser())
-        .add("store", new TrafficEventStore())
+        .add("sink", new TrafficEventSink())
       .connect()
         .fromStream(TrafficApp.STREAM_NAME).to("parser")
-        .from("parser").to("store")
+        .from("parser").to("sink")
       .build();
   }
 }
