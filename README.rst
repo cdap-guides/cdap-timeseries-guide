@@ -119,7 +119,9 @@ creates a Dataset to store the processed data.  TrafficApp uses a
 which orders data by a key, plus timestamp.  This makes it possible to efficiently query out the reported 
 values for a given time range.
 
-Finally, TrafficApp adds a Flow to process data from the Stream, and a Service to query the traffic events that have been processed and stored.
+Finally, TrafficApp adds a `Flow <http://docs.cdap.io/cdap/current/en/dev-guide.html#flows>` 
+to process data from the Stream, and a  `Service <http://docs.cdap.io/cdap/current/en/dev-guide.html#services>`_ 
+to query the traffic events that have been processed and stored.
 
 The incoming traffic events are processed in two phases, defined in the TrafficFlow class by building a FlowSpecification in the configure() method:
 
@@ -206,8 +208,9 @@ Each StreamEvent contains a request body with the raw input data, which we expec
   <road segment ID>, <timestamp>, <type>, <count>
 
 The process() method validates each field for the correct type, constructs a new TrafficEvent object, 
-and emits the object to any downstream Flowlets using the defined OutputEmitter instance
-(<link to Flowlet documentation>).
+and emits the object to any downstream Flowlets using the defined 
+`OutputEmitter <http://docs.cdap.io/cdap/2.5.0/en/javadocs/co/cask/cdap/api/flow/flowlet/OutputEmitter.html>`_
+instance.
 
 The next step in the pipeline is the TrafficEventSink Flowlet:
 
@@ -226,9 +229,18 @@ The next step in the pipeline is the TrafficEventSink Flowlet:
     }
   }
 
-In order to access the CounterTimeseriesTable used by the application, TrafficEventSink declares a variable with the @UseDataSet annotation and the name used to create the Dataset in TrafficApp.  This variable will be injected with a reference to the CounterTimeseriesTable instance when the Flowlet runs.
+In order to access the CounterTimeseriesTable used by the application, TrafficEventSink declares a variable with 
+the `@UseDataSet <http://docs.cdap.io/cdap/2.5.0/en/javadocs/co/cask/cdap/api/annotation/UseDataSet.html>`_ annotation
+and the name used to create the Dataset in TrafficApp.  This variable will be injected with a reference to the
+CounterTimeseriesTable instance when the Flowlet runs.
 
-TrafficEventSink also defines a process() method, annotated with @ProcessInput, for handling incoming events from TrafficEventParser.  Since TrafficEventParser emitted TrafficEvent objects, the process method takes an input parameter of the same type.  Here, we simply increment a counter for the incoming event, using the road segment ID as the key, and adding the event type (VEHICLE or ACCIDENT) as a tag.  When querying records out of the CounterTimeseriesTable, we can specify the required tags as an additional filter on the records to return.  Only those entries having all of given tags will be returned in the results.
+TrafficEventSink also defines a process() method, annotated with 
+`@ProcessInput <http://docs.cdap.io/cdap/2.5.0/en/javadocs/co/cask/cdap/api/annotation/ProcessInput.html>`_,
+for handling incoming events from TrafficEventParser.  Since TrafficEventParser emitted TrafficEvent objects, 
+the process method takes an input parameter of the same type.  Here, we simply increment a counter for the 
+incoming event, using the road segment ID as the key, and adding the event type (VEHICLE or ACCIDENT) as a tag.  
+When querying records out of the CounterTimeseriesTable, we can specify the required tags as an additional filter 
+on the records to return.  Only those entries having all of given tags will be returned in the results.
 
 Now that we have the full pipeline setup for ingesting data from our traffic sensors, we are ready to create a Service to query the traffic sensor reports in response to real-time requests.  This Service will take a given road segment ID as input, query the road segment's recent data, and respond with a simple classification of how congested that segment currently is, according to the following rules:
 If any traffic accidents were reported, return RED
@@ -338,22 +350,22 @@ We can now start the TrafficConditions service and check the service calls::
 
   cdap-cli.sh start service TrafficApp.TrafficConditions
 
-Since the service methods are exposed as a REST API, we can check the results using the curl command::
+Since the service methods are exposed as a REST API, we can check the results using the curl command (TBD: use CLI)::
 
   export SERVICE_URL=http://localhost:10000/v2/apps/TrafficApp/services/TrafficConditions/methods
   curl $SERVICE_URL/v1/road/1N1/recent && echo
-  GREEN
   curl $SERVICE_URL/v1/road/1N2/recent && echo
-  YELLOW
   curl $SERVICE_URL/v1/road/1N3/recent && echo
+
+Example output::
+
+  GREEN
+  YELLOW
   RED
 
-Congratulations!  You have now learned how to incorporate timeseries data into your CDAP applications.  Please continue to experiment and extend this sample application.  The ability to store and query time-based data can be a powerful tool in many scenarios.
-
-Related Topics
---------------
-
-TBD
+Congratulations!  You have now learned how to incorporate timeseries data into your CDAP applications.  
+Please continue to experiment and extend this sample application.  The ability to store and query time-based 
+data can be a powerful tool in many scenarios.
 
 Extend This Example
 -------------------
@@ -364,7 +376,7 @@ Modify the TrafficService to look at the average traffic volumes and use these t
 Share & Discuss
 ---------------
 
-TBD
+Have a question? Discuss at `CDAP User Mailing List <https://groups.google.com/forum/#!forum/cdap-user>`_
 
 
 .. |(AppDesign)| image:: docs/img/app-design.png
