@@ -14,10 +14,10 @@ sensor network of traffic monitors, aggregate the event counts into a traffic vo
 and query the traffic volume over a time period to produce a traffic condition report. You will:
 
 * build a `Flow <http://docs.cdap.io/cdap/current/en/dev-guide.html#flows>`_ to process events as they are received, 
-and count by road segment and event type
+  and count by road segment and event type
 * use a `Dataset <http://docs.cdap.io/cdap/current/en/dev-guide.html#datasets>`_ to store the event data
 * build a `Service <http://docs.cdap.io/cdap/current/en/dev-guide.html#services>`_ to retrieve the event counts by 
-time range
+  time range
 
 What You Will Need
 ------------------
