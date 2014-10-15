@@ -82,6 +82,7 @@ The first step is to get our application structure set up.  We will use a standa
 The application is identified by the TrafficApp class.  This class extends AbstractApplication, and overrides the configure() method in order to define all of the application components:
 
 .. code:: java
+
   public class TrafficApp extends AbstractApplication {
     static final String APP_NAME = "TrafficApp";
     static final String STREAM_NAME = "trafficStream";
