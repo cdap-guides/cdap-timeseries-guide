@@ -1,12 +1,17 @@
 Storing Timeseries Data
 =======================
 
-The Cask Data Application Platform (CDAP) provides a number of pre-packaged Datasets, which make it easy to store and retrieve data using best-practices based implementations of common data access patterns.  In this guide, you will learn how to process and store timeseries data, using the example of real-time sensor data from a traffic monitor network.
+The Cask Data Application Platform (CDAP) provides a number of pre-packaged Datasets, 
+which make it easy to store and retrieve data using best-practices based implementations of 
+common data access patterns.  In this guide, you will learn how to process and store timeseries data, 
+using the example of real-time sensor data from a traffic monitor network.
 
 What You Will Build
 -------------------
 
-This guide will take you through building a simple CDAP application to ingest data from a sensor network of traffic monitors, aggregate the event counts into a traffic volume per road segment, and query the traffic volume over a time period to produce a traffic condition report. You will:
+This guide will take you through building a simple CDAP application to ingest data from a 
+sensor network of traffic monitors, aggregate the event counts into a traffic volume per road segment,
+and query the traffic volume over a time period to produce a traffic condition report. You will:
 
 * build a Flow to process events as they are received, and count by road segment and event type
 * use a Dataset to store the event data
@@ -22,12 +27,17 @@ What You Will Need
 Let’s Build It!
 ---------------
 
-Following sections will guide you through building an application from scratch. If you are interested in deploying and running the application right away, you can download its source code and binaries from here <link>. In that case feel free to skip the next two sections and jump right to Build & Run section.
+Following sections will guide you through building an application from scratch. 
+If you are interested in deploying and running the application right away, you 
+can clone its source code and binaries from this github repository. In that case feel 
+free to skip the next two sections and jump right to Build & Run section.
 
 Application Design
 ~~~~~~~~~~~~~~~~~~
 
-For this guide, we will assume that we are processing events from a sensor network of traffic monitors.  Each traffic monitor covers a given road segment and provides periodic reports of the number of passing vehicles, and a count of any traffic accidents that have occurred.
+For this guide, we will assume that we are processing events from a sensor network of traffic monitors. 
+Each traffic monitor covers a given road segment and provides periodic reports of the number of passing vehicles,
+and a count of any traffic accidents that have occurred.
 
 Sensors report in from the network by sending event records containing the following fields:
 
@@ -41,7 +51,7 @@ Sensors report in from the network by sending event records containing the follo
 
 The application consists of the following components:
 
-<DIAGRAM>
+|(AppDesign)|
 
 Incoming events feed into the application through a Stream.  CDAP provides a REST API for ingesting events into a Stream.
 
@@ -330,3 +340,6 @@ Share & Discuss
 ---------------
 
 TBD
+
+
+.. |(AppDesign)| image:: docs/img/app-design.png
