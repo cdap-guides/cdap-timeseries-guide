@@ -9,6 +9,7 @@ What You Will Build
 This guide will take you through building a simple CDAP application to ingest data from a sensor network of traffic monitors, aggregate the event counts into a traffic volume per road segment, and query the traffic volume over a time period to produce a traffic condition report.
 
 You will:
+
 * build a Flow to process events as they are received, and count by road segment and event type
 * use a Dataset to store the event data
 * build a Service to retrieve the event counts by time range
