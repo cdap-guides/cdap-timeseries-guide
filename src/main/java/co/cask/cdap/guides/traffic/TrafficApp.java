@@ -28,8 +28,8 @@ import co.cask.cdap.api.dataset.lib.TimeseriesTables;
  */
 public class TrafficApp extends AbstractApplication {
   static final String APP_NAME = "TrafficApp";
-  static final String STREAM_NAME = "TrafficStream";
-  static final String TIMESERIES_TABLE_NAME = "TrafficEventTable";
+  static final String STREAM_NAME = "trafficEvents";
+  static final String TIMESERIES_TABLE_NAME = "trafficEventTable";
 
   /**
    * Time interval to store per row in the TimeseriesTable.  This controls the time range over which entries
