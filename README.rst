@@ -305,7 +305,10 @@ In the configure() method, TrafficConditionService defines a handler class, Traf
 The core of the service is the recentConditions() method.  TrafficConditionHandler exposes this method as REST endpoint through the use of JAX-RS annotations.  The @Path annotation defines the URL to which the endpoint will be mapped, while the @GET annotation defines the HTTP request method supported.  The recentConditions() method declares an HttpServiceRequest parameter and HttpServiceResponder parameter to, respectively, provide access to request elements, and to control the response output.  The @PathParam("segment") annotation on the third method parameter provides access to the {segment} path element as an input parameter.
 
 The recentConditions() method first queries the timeseries Dataset for any accident reports for the given road segment in the past 45 minutes.  If any are found, then a "RED" condition report will be returned.  If no accident reports are present, then it continues to query the timeseries data for the number of vehicle report entries that exceed a set threshold (100).  Based on the number of entries found, the method returns the appropriate congestion level according to the rules previously described.
+
 Build & Run
+-----------
+
 The TrafficApp application can be built and packaged using standard Apache Maven commands::
 
   mvn clean package
