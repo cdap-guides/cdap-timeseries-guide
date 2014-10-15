@@ -52,7 +52,7 @@ In addition to storing the sensor data as a timeseries, we also want to query th
 Implementation
 --------------
 
-The first step is to get our application structure set up.  We will use a standard Maven project structure for all of the source code files:
+The first step is to get our application structure set up.  We will use a standard Maven project structure for all of the source code files::
 
   ./pom.xml
   ./README.md
@@ -170,7 +170,7 @@ First, let’s look at TrafficEventParser in more detail:
     }
   }
 
-The process() method is annotated with @ProcessInput, telling CDAP that this method should be invoked for incoming events.  Since TrafficEventParser is connected to the Stream, it receives events of type StreamEvent.  Each StreamEvent contains a request body with the raw input data, which we expect in the format:
+The process() method is annotated with @ProcessInput, telling CDAP that this method should be invoked for incoming events.  Since TrafficEventParser is connected to the Stream, it receives events of type StreamEvent.  Each StreamEvent contains a request body with the raw input data, which we expect in the format::
 
   <road segment ID>, <timestamp>, <type>, <count>
 
@@ -279,37 +279,37 @@ The core of the service is the recentConditions() method.  TrafficConditionHandl
 
 The recentConditions() method first queries the timeseries Dataset for any accident reports for the given road segment in the past 45 minutes.  If any are found, then a "RED" condition report will be returned.  If no accident reports are present, then it continues to query the timeseries data for the number of vehicle report entries that exceed a set threshold (100).  Based on the number of entries found, the method returns the appropriate congestion level according to the rules previously described.
 Build & Run
-The TrafficApp application can be built and packaged using standard Apache Maven commands:
+The TrafficApp application can be built and packaged using standard Apache Maven commands::
 
-  > mvn clean package
+  mvn clean package
 
 Note that the remaining commands assume that the cdap-cli.sh script is available on your PATH. If this is not the case, please add it:
 
   export PATH=$PATH:<CDAP home>/bin
 
-We can then deploy the application to a standalone CDAP installation:
+We can then deploy the application to a standalone CDAP installation::
 
-  > cdap-cli.sh deploy app target/cdap-timeseries-guide-1.0.0-SNAPSHOT.jar
-  > cdap-cli.sh start flow TrafficApp.TrafficFlow
+  cdap-cli.sh deploy app target/cdap-timeseries-guide-1.0.0-SNAPSHOT.jar
+  cdap-cli.sh start flow TrafficApp.TrafficFlow
 
-Next, we will send some sample records into the stream for processing:
+Next, we will send some sample records into the stream for processing::
 
-  > cdap-cli.sh send stream TrafficStream "1N1, now, VEHICLE, 10"
-  > cdap-cli.sh send stream TrafficStream "1N2, now, VEHICLE, 101"
-  > cdap-cli.sh send stream TrafficStream "1N3, now, ACCIDENT, 1"
+  cdap-cli.sh send stream TrafficStream "1N1, now, VEHICLE, 10"
+  cdap-cli.sh send stream TrafficStream "1N2, now, VEHICLE, 101"
+  cdap-cli.sh send stream TrafficStream "1N3, now, ACCIDENT, 1"
 
-We can now start the TrafficConditions service and check the service calls:
+We can now start the TrafficConditions service and check the service calls::
 
-  > cdap-cli.sh start service TrafficApp.TrafficConditions
+  cdap-cli.sh start service TrafficApp.TrafficConditions
 
-Since the service methods are exposed as a REST API, we can check the results using the curl command:
+Since the service methods are exposed as a REST API, we can check the results using the curl command::
 
-  > export SERVICE_URL=http://localhost:10000/v2/apps/TrafficApp/services/TrafficConditions/methods
-  > curl $SERVICE_URL/v1/road/1N1/recent && echo
+  export SERVICE_URL=http://localhost:10000/v2/apps/TrafficApp/services/TrafficConditions/methods
+  curl $SERVICE_URL/v1/road/1N1/recent && echo
   GREEN
-  > curl $SERVICE_URL/v1/road/1N2/recent && echo
+  curl $SERVICE_URL/v1/road/1N2/recent && echo
   YELLOW
-  > curl $SERVICE_URL/v1/road/1N3/recent && echo
+  curl $SERVICE_URL/v1/road/1N3/recent && echo
   RED
 
 Congratulations!  You have now learned how to incorporate timeseries data into your CDAP applications.  Please continue to experiment and extend this sample application.  The ability to store and query time-based data can be a powerful tool in many scenarios.
