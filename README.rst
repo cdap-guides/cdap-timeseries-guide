@@ -349,6 +349,10 @@ The TrafficApp application can be built and packaged using standard Apache Maven
 Note that the remaining commands assume that the cdap-cli.sh script is available on your PATH. If this is not the case, please add it::
 
   export PATH=$PATH:<CDAP home>/bin
+  
+If you haven't started already CDAP standalone, start it with the following commands::
+
+  cdap.sh start
 
 We can then deploy the application to a standalone CDAP installation::
 
