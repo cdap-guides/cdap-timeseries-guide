@@ -51,7 +51,8 @@ Sensors report in from the network by sending event records containing the follo
 
   * VEHICLE - indicates a count of vehicles passing the sensor since the last report
   * ACCIDENT - indicates a count of traffic accidents since the last report
-  * count: INT
+  
+* count: INT
 
 The application consists of the following components:
 
@@ -77,8 +78,7 @@ The first step is to get our application structure set up.  We will use a standa
   ./src/main/java/co/cask/cdap/guides/traffic/TrafficEventParser.java
   ./src/main/java/co/cask/cdap/guides/traffic/TrafficEventSink.java
   ./src/main/java/co/cask/cdap/guides/traffic/TrafficFlow.java
-  ./src/test/java/co/cask/cdap/guides/traffic/TrafficAppTest.java
-
+  
 
 The application is identified by the TrafficApp class.  This class extends 
 `AbstractApplication <http://docs.cdap.io/cdap/2.5.0/en/javadocs/co/cask/cdap/api/app/AbstractApplication.html>`_,
@@ -134,6 +134,7 @@ The incoming traffic events are processed in two phases, defined in the TrafficF
     public FlowSpecification configure() {
       return FlowSpecification.Builder.with()
         .setName(FLOW_NAME)
+        .setDescription("Reads traffic events from a stream and persists to a timeseries dataset")
         .withFlowlets()
           .add("parser", new TrafficEventParser())
           .add("sink", new TrafficEventSink())
@@ -150,6 +151,20 @@ The first Flowlet, TrafficEventParser, reads raw events from the stream, parses 
 and emits the structured event objects.   The second, TrafficEventSink, receives the structured events from 
 TrafficEventParser, and stores them to the CounterTimeseriesTable Dataset.
 
+The TrafficEvent passed in between flowlets is a simple POJO (getters and setters are omitted):
+
+.. code:: java
+
+  public class TrafficEvent {
+    public enum Type { VEHICLE, ACCIDENT };
+  
+    private final String roadSegmentId;
+    private final long timestamp;
+    private final Type type;
+    private final int count;
+
+  }
+  
 First, let’s look at TrafficEventParser in more detail:
 
 .. code:: java
@@ -337,7 +352,7 @@ Note that the remaining commands assume that the cdap-cli.sh script is available
 
 We can then deploy the application to a standalone CDAP installation::
 
-  cdap-cli.sh deploy app target/cdap-timeseries-guide-1.0.0-SNAPSHOT.jar
+  cdap-cli.sh deploy app target/cdap-timeseries-guide-1.0.0.jar
   cdap-cli.sh start flow TrafficApp.TrafficFlow
 
 Next, we will send some sample records into the stream for processing::
