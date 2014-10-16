@@ -383,7 +383,7 @@ Example output::
   RED
 
 Congratulations!  You have now learned how to incorporate timeseries data into your CDAP applications.  
-Please continue to experiment and extend this sample application.  The ability to store and query time-based 
+Please continue to experiment and extend this sample application. The ability to store and query time-based 
 data can be a powerful tool in many scenarios.
 
 Extend This Example
