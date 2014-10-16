@@ -119,7 +119,7 @@ creates a Dataset to store the processed data.  TrafficApp uses a
 which orders data by a key, plus timestamp.  This makes it possible to efficiently query out the reported 
 values for a given time range.
 
-Finally, TrafficApp adds a `Flow <http://docs.cdap.io/cdap/current/en/dev-guide.html#flows>` 
+Finally, TrafficApp adds a `Flow <http://docs.cdap.io/cdap/current/en/dev-guide.html#flows>`_ 
 to process data from the Stream, and a  `Service <http://docs.cdap.io/cdap/current/en/dev-guide.html#services>`_ 
 to query the traffic events that have been processed and stored.
 
