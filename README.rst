@@ -399,4 +399,4 @@ Share & Discuss
 Have a question? Discuss at `CDAP User Mailing List <https://groups.google.com/forum/#!forum/cdap-user>`_
 
 
-.. |(AppDesign)| image:: docs/img/app-design.png
+.. |(AppDesign)| image:: docs/images/app-design.png
