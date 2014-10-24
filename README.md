@@ -3,7 +3,7 @@ Storing Timeseries Data
 
 The [Cask Data Application Platform (CDAP)](http://cdap.io) provides a
 number of pre-packaged Datasets, which make it easy to store and
-retrieve data using best-practices based implementations of common data
+retrieve data using best-practices-based implementations of common data
 access patterns. In this guide, you will learn how to process and store
 timeseries data, using the example of real-time sensor data from a
 traffic monitor network.
@@ -18,19 +18,19 @@ event counts into a traffic volume per road segment, and query the
 traffic volume over a time period to produce a traffic condition report.
 You will:
 
--   use a
+-   Use a
     [Stream](http://docs.cdap.io/cdap/current/en/dev-guide.html#streams)
-    to ingest real-time events data
--   build a
+    to ingest real-time events data;
+-   Build a
     [Flow](http://docs.cdap.io/cdap/current/en/dev-guide.html#flows) to
     process events as they are received, and count by road segment and
-    event type
--   use a
+    event type;
+-   Use a
     [Dataset](http://docs.cdap.io/cdap/current/en/dev-guide.html#datasets)
-    to store the event data
--   build a
+    to store the event data; and
+-   Build a
     [Service](http://docs.cdap.io/cdap/current/en/dev-guide.html#services)
-    to retrieve the event counts by time range
+    to retrieve the event counts by time range.
 
 What You Will Need
 ------------------
@@ -42,11 +42,11 @@ What You Will Need
 Let’s Build It!
 ---------------
 
-Following sections will guide you through building an application from
-scratch. If you are interested in deploying and running the application
-right away, you can clone its source code and binaries from this github
-repository. In that case feel free to skip the next two sections and
-jump right to Build & Run section.
+The following sections will guide you through building an application from scratch. If you
+are interested in deploying and running the application right away, you can clone its
+source code and binaries from this GitHub repository. In that case, feel free to skip the
+next two sections and jump right to the
+Build and Run Application\_ section.
 
 ### Application Design
 
@@ -58,12 +58,12 @@ vehicles, and a count of any traffic accidents that have occurred.
 Sensors report in from the network by sending event records containing
 the following fields:
 
--   road\_segment\_id: LONG - unique identifier for the road segment
--   timestamp: "YYYY-MM-DD hh:mm:ss" formatted timestamp
+-   road\_segment\_id: LONG; unique identifier for the road segment
+-   timestamp: "YYYY-MM-DD hh:mm:ss" formatted
 -   event\_type:
-    -   VEHICLE - indicates a count of vehicles passing the sensor since
+    -   VEHICLE: indicates a count of vehicles passing the sensor since
         the last report
-    -   ACCIDENT - indicates a count of traffic accidents since the last
+    -   ACCIDENT: indicates a count of traffic accidents since the last
         report
 -   count: INT
 
@@ -74,16 +74,16 @@ The application consists of the following components:
 Incoming events feed into the application through a Stream. CDAP
 provides a REST API for ingesting events into a Stream.
 
-Once fed into the Stream, events are processed by the TrafficEventParser
+Once fed into the Stream, events are processed by the `TrafficEventParser`
 Flowlet, which normalizes and validates the event data, transforming the
-stream entry into a TrafficEvent object. The parsed TrafficEvents are
-then passed along to the TrafficEventSink Flowlet, which stores the
+stream entry into a `TrafficEvent` object. Parsed `TrafficEvent`s are
+then passed along to the `TrafficEventSink` Flowlet, which stores the
 event counts in a Timeseries Dataset. The Timeseries Dataset aggregates
 the event counts by road segment ID and time window.
 
 In addition to storing the sensor data as a timeseries, we also want to
 query the recent traffic data in order to provide traffic condition
-alerts to drivers. TrafficConditionService exposes an HTTP REST API to
+alerts to drivers. The `TrafficConditionService` exposes an HTTP RESTful API to
 support this.
 
 ### Implementation
@@ -100,18 +100,16 @@ standard Maven project structure for all of the source code files:
     ./src/main/java/co/cask/cdap/guides/traffic/TrafficEventSink.java
     ./src/main/java/co/cask/cdap/guides/traffic/TrafficFlow.java
 
-The application is identified by the TrafficApp class. This class
+The application is identified by the `TrafficApp` class. This class
 extends
-[AbstractApplication](http://docs.cdap.io/cdap/2.5.0/en/javadocs/co/cask/cdap/api/app/AbstractApplication.html),
-and overrides the configure() method in order to define all of the
-application components:
+[AbstractApplication](http://docs.cdap.io/cdap/current/en/reference/javadocs/co/cask/cdap/api/app/AbstractApplication.html),
+and overrides the configure() method to define all of the application components:
 
 ``` {.sourceCode .java}
 public class TrafficApp extends AbstractApplication {
-  static final String APP_NAME = "TrafficApp";
-  static final String STREAM_NAME = "trafficEvents";
-  static final String TIMESERIES_TABLE_NAME = "trafficEventTable";   
-
+  public static final String APP_NAME = "TrafficApp";
+  public static final String STREAM_NAME = "trafficEvents";
+  public static final String TIMESERIES_TABLE_NAME = "trafficEventTable";   
   public static final int TIMESERIES_INTERVAL = 15 * 60 * 1000; // 15 minutes 
 
   @Override
@@ -132,32 +130,31 @@ public class TrafficApp extends AbstractApplication {
 
 When it comes to handling time-based events, we need a place to receive
 and process the events themselves. CDAP provides a [real-time stream
-processing
-system](http://docs.cdap.io/cdap/current/en/dev-guide.html#flows) that
-is a great match for handling event streams. So, first, our TrafficApp
-adds a new
+processing system](http://docs.cdap.io/cdap/current/en/dev-guide.html#flows) that
+is a great match for handling event streams. After first setting
+the application name, our `TrafficApp` adds a new
 [Stream](http://docs.cdap.io/cdap/current/en/dev-guide.html#streams).
 
-We also need a place to store the traffic event records that we receive,
-so, TrafficApp next creates a Dataset to store the processed data.
-TrafficApp uses a
-[CounterTimeseriesTable](http://docs.cdap.io/cdap/2.5.0/en/javadocs/co/cask/cdap/api/dataset/lib/CounterTimeseriesTable.html),
-which orders data by a key, plus timestamp. This makes it possible to
-efficiently query out the reported values for a given time range.
+We also need a place to store the traffic event records that we receive;
+`TrafficApp` next creates a Dataset to store the processed data.
+`TrafficApp` uses a
+[CounterTimeseriesTable](http://docs.cdap.io/cdap/current/en/reference/javadocs/co/cask/cdap/api/dataset/lib/CounterTimeseriesTable.html),
+which orders data by a key plus a timestamp. This makes it possible to
+efficiently query the reported values for a given time range.
 
-Finally, TrafficApp adds a
+Finally, `TrafficApp` adds a
 [Flow](http://docs.cdap.io/cdap/current/en/dev-guide.html#flows) to
 process data from the Stream, and a
 [Service](http://docs.cdap.io/cdap/current/en/dev-guide.html#services)
 to query the traffic events that have been processed and stored.
 
 The incoming traffic events are processed in two phases, defined in the
-TrafficFlow class by building a FlowSpecification in the configure()
+`TrafficFlow` class by building a `FlowSpecification` in the configure()
 method:
 
 ``` {.sourceCode .java}
 public class TrafficFlow implements Flow {
-  static final String FLOW_NAME = "TrafficFlow";
+  public static final String FLOW_NAME = "TrafficFlow";
 
   @Override
   public FlowSpecification configure() {
@@ -175,17 +172,17 @@ public class TrafficFlow implements Flow {
 }
 ```
 
-TrafficFlow first registers the two
-[Flowlets](http://docs.cdap.io/cdap/current/en/dev-guide.html#flowlets)
+`TrafficFlow` first registers the two
+[Flowlets](http://docs.cdap.io/cdap/current/en/developer-guide/building-blocks/flows-flowlets/flowlets.html)
 to be used in the specification, then connects the registered Flowlets
-into a processing pipeline. The first Flowlet, TrafficEventParser, reads
-raw events from the stream, parses and validates the individual fields,
-and emits the structured event objects. The second, TrafficEventSink,
-receives the structured events from TrafficEventParser, and stores them
-to the CounterTimeseriesTable Dataset.
+into a processing pipeline. The first Flowlet, `TrafficEventParser`, reads
+raw events from the Stream, parses and validates the individual fields,
+and then emits the structured event objects. The second flowlet, `TrafficEventSink`,
+receives the structured events from `TrafficEventParser`, and stores them
+to the `CounterTimeseriesTable` Dataset.
 
-The TrafficEvent passed in between flowlets is a simple POJO (getters
-and setters are omitted):
+The `TrafficEvent` passed between the Flowlets is a simple POJO (getters
+and setters omitted in this code fragment):
 
 ``` {.sourceCode .java}
 public class TrafficEvent {
@@ -199,7 +196,7 @@ public class TrafficEvent {
 }
 ```
 
-First, let’s look at TrafficEventParser in more detail:
+First, let’s look at `TrafficEventParser` in more detail:
 
 ``` {.sourceCode .java}
 public class TrafficEventParser extends AbstractFlowlet {
@@ -250,21 +247,21 @@ public class TrafficEventParser extends AbstractFlowlet {
 }
 ```
 
-The process() method is annotated with @ProcessInput, telling CDAP that
+The process() method is annotated with `@ProcessInput`, telling CDAP that
 this method should be invoked for incoming events. Since
-TrafficEventParser is connected to the Stream, it receives events of
-type StreamEvent. Each StreamEvent contains a request body with the raw
+`TrafficEventParser` is connected to the Stream, it receives events of
+type `StreamEvent`. Each `StreamEvent` contains a request body with the raw
 input data, which we expect in the format:
 
     <road segment ID>, <timestamp>, <type>, <count>
 
-The process() method validates each field for the correct type,
-constructs a new TrafficEvent object, and emits the object to any
+The `process()` method validates each field for the correct type,
+constructs a new `TrafficEvent` object, and emits the object to any
 downstream Flowlets using the defined
-[OutputEmitter](http://docs.cdap.io/cdap/2.5.0/en/javadocs/co/cask/cdap/api/flow/flowlet/OutputEmitter.html)
+[OutputEmitter](http://docs.cdap.io/cdap/current/en/reference/javadocs/co/cask/cdap/api/flow/flowlet/OutputEmitter.html)
 instance.
 
-The next step in the pipeline is the TrafficEventSink Flowlet:
+The next step in the pipeline is the `TrafficEventSink` Flowlet:
 
 ``` {.sourceCode .java}
 public class TrafficEventSink extends AbstractFlowlet {
@@ -281,42 +278,44 @@ public class TrafficEventSink extends AbstractFlowlet {
 }
 ```
 
-In order to access the CounterTimeseriesTable used by the application,
-TrafficEventSink declares a variable with the
-[@UseDataSet](http://docs.cdap.io/cdap/2.5.0/en/javadocs/co/cask/cdap/api/annotation/UseDataSet.html)
-annotation and the name used to create the Dataset in TrafficApp. This
-variable will be injected with a reference to the CounterTimeseriesTable
+In order to access the `CounterTimeseriesTable` used by the application,
+`TrafficEventSink` declares a variable with the
+[@UseDataSet](http://docs.cdap.io/cdap/current/en/reference/javadocs/co/cask/cdap/api/annotation/UseDataSet.html)
+annotation and the name used to create the Dataset in `TrafficApp`. This
+variable will be injected with a reference to the `CounterTimeseriesTable`
 instance when the Flowlet runs.
 
-TrafficEventSink also defines a process() method, annotated with
-[@ProcessInput](http://docs.cdap.io/cdap/2.5.0/en/javadocs/co/cask/cdap/api/annotation/ProcessInput.html),
-for handling incoming events from TrafficEventParser. Since
-TrafficEventParser emitted TrafficEvent objects, the process method
+`TrafficEventSink` also defines a `process()` method, annotated with
+[@ProcessInput](http://docs.cdap.io/cdap/current/en/javadocs/co/cask/cdap/api/annotation/ProcessInput.html),
+for handling incoming events from `TrafficEventParser`. Since
+`TrafficEventParser` emits `TrafficEvent` objects, the process method
 takes an input parameter of the same type. Here, we simply increment a
 counter for the incoming event, using the road segment ID as the key,
 and adding the event type (VEHICLE or ACCIDENT) as a tag. When querying
-records out of the CounterTimeseriesTable, we can specify the required
+records out of the `CounterTimeseriesTable`, we can specify the required
 tags as an additional filter on the records to return. Only those
-entries having all of given tags will be returned in the results.
+entries having all of the given tags will be returned in the results.
 
 Now that we have the full pipeline setup for ingesting data from our
 traffic sensors, we are ready to create a Service to query the traffic
 sensor reports in response to real-time requests. This Service will take
 a given road segment ID as input, query the road segment's recent data,
 and respond with a simple classification of how congested that segment
-currently is, according to the following rules: If any traffic accidents
-were reported, return RED If 2+ vehicle count reports are greater than
-the threshold, return RED If 1 vehicle count report is greater than the
-threshold, return YELLOW Otherwise, return GREEN.
+currently is, according to these rules:
 
-TrafficConditionService defines a simple HTTP REST endpoint to perform
+-   If any traffic accidents were reported, return RED;
+-   If 2+ vehicle count reports are greater than the threshold, return RED;
+-   If 1 vehicle count report is greater than the threshold, return YELLOW;
+-   Otherwise, return GREEN.
+
+`TrafficConditionService` defines a simple HTTP RESTful endpoint to perform
 this query and return a response:
 
 ``` {.sourceCode .java}
 public class TrafficConditionService extends AbstractService {
   public enum Condition {GREEN, YELLOW, RED};
 
-  static final String SERVICE_NAME = "TrafficConditions";
+  public static final String SERVICE_NAME = "TrafficConditions";
 
   @Override
   protected void configure() {
@@ -380,27 +379,27 @@ public class TrafficConditionService extends AbstractService {
 }
 ```
 
-In the configure() method, TrafficConditionService defines a handler
-class, TrafficConditionHandler, and Dataset to use in serving requests.
-TrafficConditionHandler once again makes use of the @UseDataSet
+In the `configure()` method, `TrafficConditionService` defines a handler
+class, `TrafficConditionHandler`, and a Dataset to use in serving requests.
+`TrafficConditionHandler` once again makes use of the `@UseDataSet`
 annotation on an instance variable to obtain a reference to the
-CounterTimeseriesTable Dataset where traffic events are persisted.
+`CounterTimeseriesTable` Dataset where traffic events are persisted.
 
-The core of the service is the recentConditions() method.
-TrafficConditionHandler exposes this method as REST endpoint through the
-use of JAX-RS annotations. The @Path annotation defines the URL to which
-the endpoint will be mapped, while the @GET annotation defines the HTTP
-request method supported. The recentConditions() method declares an
-HttpServiceRequest parameter and HttpServiceResponder parameter to,
-respectively, provide access to request elements, and to control the
-response output. The @PathParam("segment") annotation on the third
-method parameter provides access to the {segment} path element as an
+The core of the service is the `recentConditions()` method.
+`TrafficConditionHandler` exposes this method as a RESTful endpoint through the
+use of JAX-RS annotations. The `@Path` annotation defines the URL to which
+the endpoint will be mapped, while the `@GET` annotation defines the HTTP
+request method supported. The `recentConditions()` method declares
+`HttpServiceRequest` and `HttpServiceResponder` parameters to,
+respectively, provide access to request elements and to control the
+response output. The `@PathParam` ("segment") annotation on the third
+method parameter provides access to the `{segment}` path element as an
 input parameter.
 
 The recentConditions() method first queries the timeseries Dataset for
 any accident reports for the given road segment in the past 45 minutes.
-If any are found, then a "RED" condition report will be returned. If no
-accident reports are present, then it continues to query the timeseries
+If any are found, a "RED" condition report will be returned. If no
+accident reports are present, it continues to query the timeseries
 data for the number of vehicle report entries that exceed a set
 threshold (100). Based on the number of entries found, the method
 returns the appropriate congestion level according to the rules
@@ -414,13 +413,12 @@ Apache Maven commands:
 
     mvn clean package
 
-Note that the remaining commands assume that the cdap-cli.sh script is
+Note that the remaining commands assume that the `cdap-cli.sh` script is
 available on your PATH. If this is not the case, please add it:
 
     export PATH=$PATH:<CDAP home>/bin
 
-If you haven't started already CDAP standalone, start it with the
-following commands:
+If you haven't started already CDAP standalone, start it with the command:
 
     cdap.sh start
 
@@ -440,7 +438,7 @@ calls:
 
     cdap-cli.sh start service TrafficApp.TrafficConditions
 
-Since the service methods are exposed as a REST API, we can check the
+Since the service methods are exposed as a RESTful API, we can check the
 results using the curl command (TBD: use CLI):
 
     export SERVICE_URL=http://localhost:10000/v2/apps/TrafficApp/services/TrafficConditions/methods
@@ -464,7 +462,7 @@ Extend This Example
 
 Write a MapReduce job to look at traffic volume over the last 30 days
 and store the average traffic volume for each 15 minute time slot in the
-day into another data set. Modify the TrafficService to look at the
+day into another data set. Modify the `TrafficService` to look at the
 average traffic volumes and use these to identify when traffic is
 congested.
 
