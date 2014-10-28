@@ -69,7 +69,7 @@ the following fields:
 
 The application consists of the following components:
 
-![(AppDesign)](docs/images/app-design.png)
+![](docs/images/app-design.png)
 
 Incoming events feed into the application through a Stream. CDAP
 provides a REST API for ingesting events into a Stream.
