@@ -46,7 +46,7 @@ The following sections will guide you through building an application from scrat
 are interested in deploying and running the application right away, you can clone its
 source code and binaries from this GitHub repository. In that case, feel free to skip the
 next two sections and jump right to the
-Build and Run Application\_ section.
+[Build and Run Application][] section.
 
 ### Application Design
 
@@ -58,21 +58,21 @@ vehicles, and a count of any traffic accidents that have occurred.
 Sensors report in from the network by sending event records containing
 the following fields:
 
--   road\_segment\_id: LONG; unique identifier for the road segment
--   timestamp: "YYYY-MM-DD hh:mm:ss" formatted
--   event\_type:
-    -   VEHICLE: indicates a count of vehicles passing the sensor since
+-   `road_segment_id`: LONG; unique identifier for the road segment
+-   `timestamp: "YYYY-MM-DD hh:mm:ss" formatted
+-   `event_type`:
+    -   `VEHICLE`: indicates a count of vehicles passing the sensor since
         the last report
-    -   ACCIDENT: indicates a count of traffic accidents since the last
+    -   `ACCIDENT`: indicates a count of traffic accidents since the last
         report
--   count: INT
+-   `count`: INT
 
 The application consists of the following components:
 
 ![](docs/images/app-design.png)
 
 Incoming events feed into the application through a Stream. CDAP
-provides a REST API for ingesting events into a Stream.
+provides a RESTful API for ingesting events into a Stream.
 
 Once fed into the Stream, events are processed by the `TrafficEventParser`
 Flowlet, which normalizes and validates the event data, transforming the
@@ -280,13 +280,13 @@ public class TrafficEventSink extends AbstractFlowlet {
 
 In order to access the `CounterTimeseriesTable` used by the application,
 `TrafficEventSink` declares a variable with the
-[@UseDataSet](http://docs.cdap.io/cdap/current/en/reference/javadocs/co/cask/cdap/api/annotation/UseDataSet.html)
+[\@UseDataSet](http://docs.cdap.io/cdap/current/en/reference/javadocs/co/cask/cdap/api/annotation/UseDataSet.html)
 annotation and the name used to create the Dataset in `TrafficApp`. This
 variable will be injected with a reference to the `CounterTimeseriesTable`
 instance when the Flowlet runs.
 
 `TrafficEventSink` also defines a `process()` method, annotated with
-[@ProcessInput](http://docs.cdap.io/cdap/current/en/javadocs/co/cask/cdap/api/annotation/ProcessInput.html),
+[\@ProcessInput](http://docs.cdap.io/cdap/current/en/javadocs/co/cask/cdap/api/annotation/ProcessInput.html),
 for handling incoming events from `TrafficEventParser`. Since
 `TrafficEventParser` emits `TrafficEvent` objects, the process method
 takes an input parameter of the same type. Here, we simply increment a
@@ -439,12 +439,14 @@ calls:
     cdap-cli.sh start service TrafficApp.TrafficConditions
 
 Since the service methods are exposed as a RESTful API, we can check the
-results using the curl command (TBD: use CLI):
+results using the curl command:
 
     export SERVICE_URL=http://localhost:10000/v2/apps/TrafficApp/services/TrafficConditions/methods
     curl $SERVICE_URL/v1/road/1N1/recent && echo
     curl $SERVICE_URL/v1/road/1N2/recent && echo
     curl $SERVICE_URL/v1/road/1N3/recent && echo
+
+[//]: # "(TBD: use CLI for above example.)"
 
 Example output:
 
