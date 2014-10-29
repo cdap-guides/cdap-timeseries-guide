@@ -105,7 +105,7 @@ extends
 [AbstractApplication](http://docs.cdap.io/cdap/current/en/reference/javadocs/co/cask/cdap/api/app/AbstractApplication.html),
 and overrides the configure() method to define all of the application components:
 
-``` {.sourceCode .java}
+```java
 public class TrafficApp extends AbstractApplication {
   public static final String APP_NAME = "TrafficApp";
   public static final String STREAM_NAME = "trafficEvents";
@@ -152,7 +152,7 @@ The incoming traffic events are processed in two phases, defined in the
 `TrafficFlow` class by building a `FlowSpecification` in the configure()
 method:
 
-``` {.sourceCode .java}
+```java
 public class TrafficFlow implements Flow {
   public static final String FLOW_NAME = "TrafficFlow";
 
@@ -184,7 +184,7 @@ to the `CounterTimeseriesTable` Dataset.
 The `TrafficEvent` passed between the Flowlets is a simple POJO (getters
 and setters omitted in this code fragment):
 
-``` {.sourceCode .java}
+```java
 public class TrafficEvent {
   public enum Type { VEHICLE, ACCIDENT };
 
@@ -198,7 +198,7 @@ public class TrafficEvent {
 
 First, let’s look at `TrafficEventParser` in more detail:
 
-``` {.sourceCode .java}
+```java
 public class TrafficEventParser extends AbstractFlowlet {
   public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss"; 
 
@@ -263,7 +263,7 @@ instance.
 
 The next step in the pipeline is the `TrafficEventSink` Flowlet:
 
-``` {.sourceCode .java}
+```java
 public class TrafficEventSink extends AbstractFlowlet {
   @UseDataSet(TrafficApp.TIMESERIES_TABLE_NAME)
   private CounterTimeseriesTable table;
@@ -311,7 +311,7 @@ currently is, according to these rules:
 `TrafficConditionService` defines a simple HTTP RESTful endpoint to perform
 this query and return a response:
 
-``` {.sourceCode .java}
+```java
 public class TrafficConditionService extends AbstractService {
   public enum Condition {GREEN, YELLOW, RED};
 
