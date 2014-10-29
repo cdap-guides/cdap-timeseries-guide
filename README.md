@@ -11,33 +11,33 @@ traffic monitor network.
 What You Will Build
 -------------------
 
-This guide will take you through building a simple [CDAP
-application](http://docs.cdap.io/cdap/current/en/dev-guide.html#applications)
+This guide will take you through building a simple
+[CDAP application](http://docs.cdap.io/cdap/current/en/developer-guide/building-blocks/applications.html)
 to ingest data from a sensor network of traffic monitors, aggregate the
 event counts into a traffic volume per road segment, and query the
 traffic volume over a time period to produce a traffic condition report.
 You will:
 
--   Use a
-    [Stream](http://docs.cdap.io/cdap/current/en/dev-guide.html#streams)
-    to ingest real-time events data;
--   Build a
-    [Flow](http://docs.cdap.io/cdap/current/en/dev-guide.html#flows) to
-    process events as they are received, and count by road segment and
-    event type;
--   Use a
-    [Dataset](http://docs.cdap.io/cdap/current/en/dev-guide.html#datasets)
-    to store the event data; and
--   Build a
-    [Service](http://docs.cdap.io/cdap/current/en/dev-guide.html#services)
-    to retrieve the event counts by time range.
+- Use a
+  [Stream](http://docs.cdap.io/cdap/current/en/developer-guide/building-blocks/streams.html)
+  to ingest real-time events data;
+- Build a
+  [Flow](http://docs.cdap.io/cdap/current/en/developer-guide/building-blocks/flows-flowlets/flows.html)
+  to process events as they are received, and count by road segment and
+  event type;
+- Use a
+  [Dataset](http://docs.cdap.io/cdap/current/en/developer-guide/building-blocks/datasets/index.html)
+  to store the event data; and
+- Build a
+  [Service](http://docs.cdap.io/cdap/current/en/developer-guide/building-blocks/services.html)
+  to retrieve the event counts by time range.
 
 What You Will Need
 ------------------
 
--   [JDK 6 or JDK 7](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
--   [Apache Maven 3.0+](http://maven.apache.org/)
--   [CDAP SDK](http://docs.cdap.io/cdap/current/en/getstarted.html#download-and-setup)
+- [JDK 6 or JDK 7](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+- [Apache Maven 3.0+](http://maven.apache.org/)
+- [CDAP SDK](http://docs.cdap.io/cdap/current/en/developer-guide/getting-started/standalone/index.html)
 
 Let’s Build It!
 ---------------
@@ -46,7 +46,7 @@ The following sections will guide you through building an application from scrat
 are interested in deploying and running the application right away, you can clone its
 source code and binaries from this GitHub repository. In that case, feel free to skip the
 next two sections and jump right to the
-Build and Run Application\_ section.
+[Build and Run Application](#build-and-run-application) section.
 
 ### Application Design
 
@@ -58,21 +58,21 @@ vehicles, and a count of any traffic accidents that have occurred.
 Sensors report in from the network by sending event records containing
 the following fields:
 
--   road\_segment\_id: LONG; unique identifier for the road segment
--   timestamp: "YYYY-MM-DD hh:mm:ss" formatted
--   event\_type:
-    -   VEHICLE: indicates a count of vehicles passing the sensor since
-        the last report
-    -   ACCIDENT: indicates a count of traffic accidents since the last
-        report
--   count: INT
+- `road_segment_id`: `LONG`; unique identifier for the road segment
+- `timestamp`: `YYYY-MM-DD hh:mm:ss` formatted
+- `event_type`:
+    - `VEHICLE`: indicates a count of vehicles passing the sensor since
+      the last report
+    - `ACCIDENT`: indicates a count of traffic accidents since the last
+      report
+- `count`: `INT`
 
 The application consists of the following components:
 
 ![](docs/images/app-design.png)
 
 Incoming events feed into the application through a Stream. CDAP
-provides a REST API for ingesting events into a Stream.
+provides a RESTful API for ingesting events into a Stream.
 
 Once fed into the Stream, events are processed by the `TrafficEventParser`
 Flowlet, which normalizes and validates the event data, transforming the
@@ -92,7 +92,6 @@ The first step is to get our application structure set up. We will use a
 standard Maven project structure for all of the source code files:
 
     ./pom.xml
-    ./README.rst
     ./src/main/java/co/cask/cdap/guides/traffic/TrafficApp.java
     ./src/main/java/co/cask/cdap/guides/traffic/TrafficConditionService.java
     ./src/main/java/co/cask/cdap/guides/traffic/TrafficEvent.java
@@ -100,8 +99,7 @@ standard Maven project structure for all of the source code files:
     ./src/main/java/co/cask/cdap/guides/traffic/TrafficEventSink.java
     ./src/main/java/co/cask/cdap/guides/traffic/TrafficFlow.java
 
-The application is identified by the `TrafficApp` class. This class
-extends
+The application is identified by the `TrafficApp` class. This class extends
 [AbstractApplication](http://docs.cdap.io/cdap/current/en/reference/javadocs/co/cask/cdap/api/app/AbstractApplication.html),
 and overrides the configure() method to define all of the application components:
 
@@ -280,13 +278,13 @@ public class TrafficEventSink extends AbstractFlowlet {
 
 In order to access the `CounterTimeseriesTable` used by the application,
 `TrafficEventSink` declares a variable with the
-[@UseDataSet](http://docs.cdap.io/cdap/current/en/reference/javadocs/co/cask/cdap/api/annotation/UseDataSet.html)
+[\@UseDataSet](http://docs.cdap.io/cdap/current/en/reference/javadocs/co/cask/cdap/api/annotation/UseDataSet.html)
 annotation and the name used to create the Dataset in `TrafficApp`. This
 variable will be injected with a reference to the `CounterTimeseriesTable`
 instance when the Flowlet runs.
 
 `TrafficEventSink` also defines a `process()` method, annotated with
-[@ProcessInput](http://docs.cdap.io/cdap/current/en/javadocs/co/cask/cdap/api/annotation/ProcessInput.html),
+[\@ProcessInput](http://docs.cdap.io/cdap/current/en/reference/javadocs/co/cask/cdap/api/annotation/ProcessInput.html),
 for handling incoming events from `TrafficEventParser`. Since
 `TrafficEventParser` emits `TrafficEvent` objects, the process method
 takes an input parameter of the same type. Here, we simply increment a
@@ -408,8 +406,7 @@ previously described.
 Build and Run Application
 -------------------------
 
-The `TrafficApp` application can be built and packaged using standard
-Apache Maven commands:
+The `TrafficApp` application can be built and packaged using the Apache Maven command:
 
     mvn clean package
 
@@ -439,12 +436,14 @@ calls:
     cdap-cli.sh start service TrafficApp.TrafficConditions
 
 Since the service methods are exposed as a RESTful API, we can check the
-results using the curl command (TBD: use CLI):
+results using the curl command:
 
     export SERVICE_URL=http://localhost:10000/v2/apps/TrafficApp/services/TrafficConditions/methods
     curl $SERVICE_URL/v1/road/1N1/recent && echo
     curl $SERVICE_URL/v1/road/1N2/recent && echo
     curl $SERVICE_URL/v1/road/1N3/recent && echo
+
+[//]: # "(TBD: use CLI for above example.)"
 
 Example output:
 
@@ -469,5 +468,21 @@ congested.
 Share and Discuss!
 ------------------
 
-Have a question? Discuss at [CDAP User Mailing List](https://groups.google.com/forum/#!forum/cdap-user)
+Have a question? Discuss at the [CDAP User Mailing List.](https://groups.google.com/forum/#!forum/cdap-user)
 
+License
+-------
+
+Copyright © 2014 Cask Data, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may
+not use this file except in compliance with the License. You may obtain
+a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
