@@ -11,33 +11,33 @@ traffic monitor network.
 What You Will Build
 -------------------
 
-This guide will take you through building a simple [CDAP
-application](http://docs.cdap.io/cdap/current/en/dev-guide.html#applications)
+This guide will take you through building a simple
+[CDAP application](http://docs.cdap.io/cdap/current/en/developer-guide/building-blocks/applications.html)
 to ingest data from a sensor network of traffic monitors, aggregate the
 event counts into a traffic volume per road segment, and query the
 traffic volume over a time period to produce a traffic condition report.
 You will:
 
--   Use a
-    [Stream](http://docs.cdap.io/cdap/current/en/dev-guide.html#streams)
-    to ingest real-time events data;
--   Build a
-    [Flow](http://docs.cdap.io/cdap/current/en/dev-guide.html#flows) to
-    process events as they are received, and count by road segment and
-    event type;
--   Use a
-    [Dataset](http://docs.cdap.io/cdap/current/en/dev-guide.html#datasets)
-    to store the event data; and
--   Build a
-    [Service](http://docs.cdap.io/cdap/current/en/dev-guide.html#services)
-    to retrieve the event counts by time range.
+- Use a
+  [Stream](http://docs.cdap.io/cdap/current/en/developer-guide/building-blocks/streams.html)
+  to ingest real-time events data;
+- Build a
+  [Flow](http://docs.cdap.io/cdap/current/en/developer-guide/building-blocks/flows-flowlets/flows.html)
+  to process events as they are received, and count by road segment and
+  event type;
+- Use a
+  [Dataset](http://docs.cdap.io/cdap/current/en/developer-guide/building-blocks/datasets/index.html)
+  to store the event data; and
+- Build a
+  [Service](http://docs.cdap.io/cdap/current/en/developer-guide/building-blocks/services.html)
+  to retrieve the event counts by time range.
 
 What You Will Need
 ------------------
 
--   [JDK 6 or JDK 7](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
--   [Apache Maven 3.0+](http://maven.apache.org/)
--   [CDAP SDK](http://docs.cdap.io/cdap/current/en/getstarted.html#download-and-setup)
+- [JDK 6 or JDK 7](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+- [Apache Maven 3.0+](http://maven.apache.org/)
+- [CDAP SDK](http://docs.cdap.io/cdap/current/en/developer-guide/getting-started/standalone/index.html)
 
 Let’s Build It!
 ---------------
@@ -58,14 +58,14 @@ vehicles, and a count of any traffic accidents that have occurred.
 Sensors report in from the network by sending event records containing
 the following fields:
 
--   `road_segment_id`: LONG; unique identifier for the road segment
--   `timestamp: "YYYY-MM-DD hh:mm:ss" formatted
--   `event_type`:
-    -   `VEHICLE`: indicates a count of vehicles passing the sensor since
-        the last report
-    -   `ACCIDENT`: indicates a count of traffic accidents since the last
-        report
--   `count`: INT
+- `road_segment_id`: `LONG`; unique identifier for the road segment
+- `timestamp`: `YYYY-MM-DD hh:mm:ss` formatted
+- `event_type`:
+    - `VEHICLE`: indicates a count of vehicles passing the sensor since
+      the last report
+    - `ACCIDENT`: indicates a count of traffic accidents since the last
+      report
+- `count`: `INT`
 
 The application consists of the following components:
 
@@ -92,7 +92,6 @@ The first step is to get our application structure set up. We will use a
 standard Maven project structure for all of the source code files:
 
     ./pom.xml
-    ./README.rst
     ./src/main/java/co/cask/cdap/guides/traffic/TrafficApp.java
     ./src/main/java/co/cask/cdap/guides/traffic/TrafficConditionService.java
     ./src/main/java/co/cask/cdap/guides/traffic/TrafficEvent.java
@@ -100,12 +99,11 @@ standard Maven project structure for all of the source code files:
     ./src/main/java/co/cask/cdap/guides/traffic/TrafficEventSink.java
     ./src/main/java/co/cask/cdap/guides/traffic/TrafficFlow.java
 
-The application is identified by the `TrafficApp` class. This class
-extends
+The application is identified by the `TrafficApp` class. This class extends
 [AbstractApplication](http://docs.cdap.io/cdap/current/en/reference/javadocs/co/cask/cdap/api/app/AbstractApplication.html),
 and overrides the configure() method to define all of the application components:
 
-``` {.sourceCode .java}
+```java
 public class TrafficApp extends AbstractApplication {
   public static final String APP_NAME = "TrafficApp";
   public static final String STREAM_NAME = "trafficEvents";
@@ -152,7 +150,7 @@ The incoming traffic events are processed in two phases, defined in the
 `TrafficFlow` class by building a `FlowSpecification` in the configure()
 method:
 
-``` {.sourceCode .java}
+```java
 public class TrafficFlow implements Flow {
   public static final String FLOW_NAME = "TrafficFlow";
 
@@ -184,7 +182,7 @@ to the `CounterTimeseriesTable` Dataset.
 The `TrafficEvent` passed between the Flowlets is a simple POJO (getters
 and setters omitted in this code fragment):
 
-``` {.sourceCode .java}
+```java
 public class TrafficEvent {
   public enum Type { VEHICLE, ACCIDENT };
 
@@ -198,7 +196,7 @@ public class TrafficEvent {
 
 First, let’s look at `TrafficEventParser` in more detail:
 
-``` {.sourceCode .java}
+```java
 public class TrafficEventParser extends AbstractFlowlet {
   public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss"; 
 
@@ -263,7 +261,7 @@ instance.
 
 The next step in the pipeline is the `TrafficEventSink` Flowlet:
 
-``` {.sourceCode .java}
+```java
 public class TrafficEventSink extends AbstractFlowlet {
   @UseDataSet(TrafficApp.TIMESERIES_TABLE_NAME)
   private CounterTimeseriesTable table;
@@ -286,7 +284,7 @@ variable will be injected with a reference to the `CounterTimeseriesTable`
 instance when the Flowlet runs.
 
 `TrafficEventSink` also defines a `process()` method, annotated with
-[\@ProcessInput](http://docs.cdap.io/cdap/current/en/javadocs/co/cask/cdap/api/annotation/ProcessInput.html),
+[\@ProcessInput](http://docs.cdap.io/cdap/current/en/reference/javadocs/co/cask/cdap/api/annotation/ProcessInput.html),
 for handling incoming events from `TrafficEventParser`. Since
 `TrafficEventParser` emits `TrafficEvent` objects, the process method
 takes an input parameter of the same type. Here, we simply increment a
@@ -311,7 +309,7 @@ currently is, according to these rules:
 `TrafficConditionService` defines a simple HTTP RESTful endpoint to perform
 this query and return a response:
 
-``` {.sourceCode .java}
+```java
 public class TrafficConditionService extends AbstractService {
   public enum Condition {GREEN, YELLOW, RED};
 
@@ -408,8 +406,7 @@ previously described.
 Build and Run Application
 -------------------------
 
-The `TrafficApp` application can be built and packaged using standard
-Apache Maven commands:
+The `TrafficApp` application can be built and packaged using the Apache Maven command:
 
     mvn clean package
 
@@ -471,5 +468,21 @@ congested.
 Share and Discuss!
 ------------------
 
-Have a question? Discuss at [CDAP User Mailing List](https://groups.google.com/forum/#!forum/cdap-user)
+Have a question? Discuss at the [CDAP User Mailing List.](https://groups.google.com/forum/#!forum/cdap-user)
 
+License
+-------
+
+Copyright © 2014 Cask Data, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may
+not use this file except in compliance with the License. You may obtain
+a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
