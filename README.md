@@ -46,7 +46,7 @@ The following sections will guide you through building an application from scrat
 are interested in deploying and running the application right away, you can clone its
 source code and binaries from this GitHub repository. In that case, feel free to skip the
 next two sections and jump right to the
-[Build and Run Application][] section.
+[Build and Run Application]() section.
 
 ### Application Design
 
