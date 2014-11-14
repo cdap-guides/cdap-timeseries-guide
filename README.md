@@ -12,24 +12,24 @@ What You Will Build
 -------------------
 
 This guide will take you through building a simple
-[CDAP application](http://docs.cdap.io/cdap/current/en/developer-guide/building-blocks/applications.html)
+[CDAP application](http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/applications.html)
 to ingest data from a sensor network of traffic monitors, aggregate the
 event counts into a traffic volume per road segment, and query the
 traffic volume over a time period to produce a traffic condition report.
 You will:
 
 - Use a
-  [Stream](http://docs.cdap.io/cdap/current/en/developer-guide/building-blocks/streams.html)
+  [Stream](http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/streams.html)
   to ingest real-time events data;
 - Build a
-  [Flow](http://docs.cdap.io/cdap/current/en/developer-guide/building-blocks/flows-flowlets/flows.html)
+  [Flow](http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/flows-flowlets/flows.html)
   to process events as they are received, and count by road segment and
   event type;
 - Use a
-  [Dataset](http://docs.cdap.io/cdap/current/en/developer-guide/building-blocks/datasets/index.html)
+  [Dataset](http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/datasets/index.html)
   to store the event data; and
 - Build a
-  [Service](http://docs.cdap.io/cdap/current/en/developer-guide/building-blocks/services.html)
+  [Service](http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/services.html)
   to retrieve the event counts by time range.
 
 What You Will Need
@@ -37,7 +37,7 @@ What You Will Need
 
 - [JDK 6 or JDK 7](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 - [Apache Maven 3.0+](http://maven.apache.org/)
-- [CDAP SDK](http://docs.cdap.io/cdap/current/en/developer-guide/getting-started/standalone/index.html)
+- [CDAP SDK](http://docs.cdap.io/cdap/current/en/developers-manual/getting-started/standalone/index.html)
 
 Let’s Build It!
 ---------------
@@ -100,7 +100,7 @@ standard Maven project structure for all of the source code files:
     ./src/main/java/co/cask/cdap/guides/traffic/TrafficFlow.java
 
 The application is identified by the `TrafficApp` class. This class extends
-[AbstractApplication](http://docs.cdap.io/cdap/current/en/reference/javadocs/co/cask/cdap/api/app/AbstractApplication.html),
+[AbstractApplication](http://docs.cdap.io/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/app/AbstractApplication.html),
 and overrides the configure() method to define all of the application components:
 
 ```java
@@ -136,7 +136,7 @@ the application name, our `TrafficApp` adds a new
 We also need a place to store the traffic event records that we receive;
 `TrafficApp` next creates a Dataset to store the processed data.
 `TrafficApp` uses a
-[CounterTimeseriesTable](http://docs.cdap.io/cdap/current/en/reference/javadocs/co/cask/cdap/api/dataset/lib/CounterTimeseriesTable.html),
+[CounterTimeseriesTable](http://docs.cdap.io/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/dataset/lib/CounterTimeseriesTable.html),
 which orders data by a key plus a timestamp. This makes it possible to
 efficiently query the reported values for a given time range.
 
@@ -171,7 +171,7 @@ public class TrafficFlow implements Flow {
 ```
 
 `TrafficFlow` first registers the two
-[Flowlets](http://docs.cdap.io/cdap/current/en/developer-guide/building-blocks/flows-flowlets/flowlets.html)
+[Flowlets](http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/flows-flowlets/flowlets.html)
 to be used in the specification, then connects the registered Flowlets
 into a processing pipeline. The first Flowlet, `TrafficEventParser`, reads
 raw events from the Stream, parses and validates the individual fields,
@@ -256,7 +256,7 @@ input data, which we expect in the format:
 The `process()` method validates each field for the correct type,
 constructs a new `TrafficEvent` object, and emits the object to any
 downstream Flowlets using the defined
-[OutputEmitter](http://docs.cdap.io/cdap/current/en/reference/javadocs/co/cask/cdap/api/flow/flowlet/OutputEmitter.html)
+[OutputEmitter](http://docs.cdap.io/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/flow/flowlet/OutputEmitter.html)
 instance.
 
 The next step in the pipeline is the `TrafficEventSink` Flowlet:
@@ -278,13 +278,13 @@ public class TrafficEventSink extends AbstractFlowlet {
 
 In order to access the `CounterTimeseriesTable` used by the application,
 `TrafficEventSink` declares a variable with the
-[\@UseDataSet](http://docs.cdap.io/cdap/current/en/reference/javadocs/co/cask/cdap/api/annotation/UseDataSet.html)
+[\@UseDataSet](http://docs.cdap.io/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/annotation/UseDataSet.html)
 annotation and the name used to create the Dataset in `TrafficApp`. This
 variable will be injected with a reference to the `CounterTimeseriesTable`
 instance when the Flowlet runs.
 
 `TrafficEventSink` also defines a `process()` method, annotated with
-[\@ProcessInput](http://docs.cdap.io/cdap/current/en/reference/javadocs/co/cask/cdap/api/annotation/ProcessInput.html),
+[\@ProcessInput](http://docs.cdap.io/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/annotation/ProcessInput.html),
 for handling incoming events from `TrafficEventParser`. Since
 `TrafficEventParser` emits `TrafficEvent` objects, the process method
 takes an input parameter of the same type. Here, we simply increment a
