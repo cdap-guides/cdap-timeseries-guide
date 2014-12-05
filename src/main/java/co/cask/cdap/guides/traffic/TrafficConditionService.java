@@ -42,7 +42,6 @@ public class TrafficConditionService extends AbstractService {
   protected void configure() {
     setName(SERVICE_NAME);
     setDescription("Service to look up recent traffic conditions for a given road segment");
-    useDataset(TrafficApp.TIMESERIES_TABLE_NAME);
     addHandler(new TrafficConditionHandler());
   }
 

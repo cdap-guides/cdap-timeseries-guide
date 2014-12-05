@@ -16,9 +16,6 @@
 
 package co.cask.cdap.guides.traffic;
 
-import co.cask.cdap.common.http.HttpRequest;
-import co.cask.cdap.common.http.HttpRequests;
-import co.cask.cdap.common.http.HttpResponse;
 import co.cask.cdap.test.ApplicationManager;
 import co.cask.cdap.test.FlowManager;
 import co.cask.cdap.test.RuntimeMetrics;
@@ -26,6 +23,10 @@ import co.cask.cdap.test.RuntimeStats;
 import co.cask.cdap.test.ServiceManager;
 import co.cask.cdap.test.StreamWriter;
 import co.cask.cdap.test.TestBase;
+import co.cask.common.http.HttpRequest;
+import co.cask.common.http.HttpRequests;
+import co.cask.common.http.HttpResponse;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -34,8 +35,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Tests covering the {@link TrafficApp} application.
@@ -127,8 +126,8 @@ public class TrafficAppTest extends TestBase {
     URL url = new URL(serviceUrl, String.format("v1/road/%s/recent", segment));
     HttpRequest request = HttpRequest.get(url).build();
     HttpResponse response = HttpRequests.execute(request);
-    assertEquals(200, response.getResponseCode());
-    assertEquals(expectedCondition.name(), response.getResponseBodyAsString());
+    Assert.assertEquals(200, response.getResponseCode());
+    Assert.assertEquals(expectedCondition.name(), response.getResponseBodyAsString());
   }
 
   private void waitForService(ServiceManager serviceManger, boolean running) throws InterruptedException {
