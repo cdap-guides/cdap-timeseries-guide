@@ -20,7 +20,7 @@ package co.cask.cdap.guides.traffic;
  * Represents a report of current conditions from a given traffic sensor.
  */
 public class TrafficEvent {
-  public enum Type { VEHICLE, ACCIDENT };
+  public enum Type { VEHICLE, ACCIDENT }
 
   private final String roadSegmentId;
   private final long timestamp;
