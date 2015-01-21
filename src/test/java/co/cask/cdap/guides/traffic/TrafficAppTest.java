@@ -87,7 +87,7 @@ public class TrafficAppTest extends TestBase {
 
       ServiceManager serviceManager = appManager.startService(TrafficConditionService.SERVICE_NAME);
       try {
-        waitForService(serviceManager, true);
+        serviceManager.waitForStatus(true);
         URL url = serviceManager.getServiceURL();
         // Segment 1 should be GREEN, since no intervals are over threshold
         assertSegmentStatus(url, segment1, TrafficConditionService.Condition.GREEN);
@@ -99,6 +99,7 @@ public class TrafficAppTest extends TestBase {
         assertSegmentStatus(url, segment4, TrafficConditionService.Condition.RED);
       } finally {
         serviceManager.stop();
+        serviceManager.waitForStatus(false);
       }
     } finally {
       flowManager.stop();
@@ -128,16 +129,5 @@ public class TrafficAppTest extends TestBase {
     HttpResponse response = HttpRequests.execute(request);
     Assert.assertEquals(200, response.getResponseCode());
     Assert.assertEquals(expectedCondition.name(), response.getResponseBodyAsString());
-  }
-
-  private void waitForService(ServiceManager serviceManger, boolean running) throws InterruptedException {
-    int attempt = 0;
-    while (attempt++ < 5) {
-      if (serviceManger.isRunning() == running) {
-        return;
-      }
-      TimeUnit.SECONDS.sleep(1);
-    }
-    throw new IllegalStateException("Service state not executed. Expected " + running);
   }
 }
