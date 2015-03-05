@@ -59,13 +59,13 @@ vehicles, and a count of any traffic accidents that have occurred.
 Sensors report in from the network by sending event records containing
 the following fields:
 
-- ``road_segment_id``: ``LONG``; unique identifier for the road segment
+- ``road_segment_id``: ``LONG`` (unique identifier for the road segment)
 - ``timestamp``: ``YYYY-MM-DD hh:mm:ss`` formatted
 - ``event_type``:
-    - ``VEHICLE``: indicates a count of vehicles passing the sensor since
-      the last report
-    - ``ACCIDENT``: indicates a count of traffic accidents since the last
-      report
+
+    - ``VEHICLE``: indicates a count of vehicles passing the sensor since the last report
+    - ``ACCIDENT``: indicates a count of traffic accidents since the last report
+      
 - ``count``: ``INT``
 
 The application consists of the following components:
