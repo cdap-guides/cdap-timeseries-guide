@@ -59,14 +59,14 @@ vehicles, and a count of any traffic accidents that have occurred.
 Sensors report in from the network by sending event records containing
 the following fields:
 
-- `road_segment_id`: `LONG`; unique identifier for the road segment
-- `timestamp`: `YYYY-MM-DD hh:mm:ss` formatted
-- `event_type`:
-    - `VEHICLE`: indicates a count of vehicles passing the sensor since
+- ``road_segment_id``: ``LONG``; unique identifier for the road segment
+- ``timestamp``: ``YYYY-MM-DD hh:mm:ss`` formatted
+- ``event_type``:
+    - ``VEHICLE``: indicates a count of vehicles passing the sensor since
       the last report
-    - `ACCIDENT`: indicates a count of traffic accidents since the last
+    - ``ACCIDENT``: indicates a count of traffic accidents since the last
       report
-- `count`: `INT`
+- ``count``: ``INT``
 
 The application consists of the following components:
 
@@ -77,16 +77,16 @@ The application consists of the following components:
 Incoming events feed into the application through a Stream. CDAP
 provides a RESTful API for ingesting events into a Stream.
 
-Once fed into the Stream, events are processed by the `TrafficEventParser`
+Once fed into the Stream, events are processed by the ``TrafficEventParser``
 Flowlet, which normalizes and validates the event data, transforming the
-stream entry into a `TrafficEvent` object. Parsed `TrafficEvent`s are
-then passed along to the `TrafficEventSink` Flowlet, which stores the
+stream entry into a ``TrafficEvent`` object. Parsed ``TrafficEvent``\ s are
+then passed along to the ``TrafficEventSink`` Flowlet, which stores the
 event counts in a Timeseries Dataset. The Timeseries Dataset aggregates
 the event counts by road segment ID and time window.
 
 In addition to storing the sensor data as a timeseries, we also want to
 query the recent traffic data in order to provide traffic condition
-alerts to drivers. The `TrafficConditionService` exposes an HTTP RESTful API to
+alerts to drivers. The ``TrafficConditionService`` exposes an HTTP RESTful API to
 support this.
 
 Implementation
@@ -102,7 +102,7 @@ standard Maven project structure for all of the source code files::
     ./src/main/java/co/cask/cdap/guides/traffic/TrafficEventSink.java
     ./src/main/java/co/cask/cdap/guides/traffic/TrafficFlow.java
 
-The application is identified by the `TrafficApp` class. This class extends
+The application is identified by the ``TrafficApp`` class. This class extends
 `AbstractApplication 
 <http://docs.cdap.io/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/app/AbstractApplication.html>`__,
 and overrides the ``configure()`` method to define all of the application components:
