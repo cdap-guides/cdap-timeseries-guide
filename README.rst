@@ -410,46 +410,46 @@ previously described.
 Build and Run Application
 =========================
 
-The ``TrafficApp`` application can be built and packaged using the Apache Maven command:
+The ``TrafficApp`` application can be built and packaged using the Apache Maven command::
 
     mvn clean package
 
 Note that the remaining commands assume that the ``cdap-cli.sh`` script is
-available on your PATH. If this is not the case, please add it:
+available on your PATH. If this is not the case, please add it::
 
     export PATH=$PATH:<CDAP home>/bin
 
-If you haven't already started a standalone CDAP installation, start it with the command:
+If you haven't already started a standalone CDAP installation, start it with the command::
 
     cdap.sh start
 
-We can then deploy the application to a standalone CDAP installation:
+We can then deploy the application to a standalone CDAP installation::
 
     cdap-cli.sh deploy app target/cdap-timeseries-guide-1.0.0.jar
     cdap-cli.sh start flow TrafficApp.TrafficFlow
 
-Next, we will send some sample records into the stream for processing:
+Next, we will send some sample records into the stream for processing::
 
     cdap-cli.sh send stream trafficEvents "1N1, now, VEHICLE, 10"
     cdap-cli.sh send stream trafficEvents "1N2, now, VEHICLE, 101"
     cdap-cli.sh send stream trafficEvents "1N3, now, ACCIDENT, 1"
 
 We can now start the TrafficConditions service and check the service
-calls:
+calls::
 
     cdap-cli.sh start service TrafficApp.TrafficConditions
 
 Since the service methods are exposed as a RESTful API, we can check the
-results using the curl command:
+results using the curl command::
 
     export SERVICE_URL=http://localhost:10000/v2/apps/TrafficApp/services/TrafficConditions/methods
     curl $SERVICE_URL/v1/road/1N1/recent && echo
     curl $SERVICE_URL/v1/road/1N2/recent && echo
     curl $SERVICE_URL/v1/road/1N3/recent && echo
 
-[//]: # "(TBD: use CLI for above example.)"
+.. TBD: use CLI for above examples
 
-Example output:
+Example output::
 
     GREEN
     YELLOW
@@ -463,11 +463,11 @@ can be a powerful tool in many scenarios.
 Extend This Example
 ===================
 
-Write a MapReduce job to look at traffic volume over the last 30 days
-and store the average traffic volume for each 15 minute time slot in the
-day into another data set. Modify the ``TrafficService`` to look at the
-average traffic volumes and use these to identify when traffic is
-congested.
+- Write a MapReduce job to look at traffic volume over the last 30 days
+  and store the average traffic volume for each 15 minute time slot in the
+  day into another data set. 
+- Modify the ``TrafficService`` to look at the average traffic volumes and use these to
+  identify when traffic is congested.
 
 Share and Discuss!
 ==================
