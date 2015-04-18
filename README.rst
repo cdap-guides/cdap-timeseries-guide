@@ -63,8 +63,8 @@ the following fields:
 - ``timestamp``: ``YYYY-MM-DD hh:mm:ss`` formatted
 - ``event_type``:
 
-    - ``VEHICLE``: indicates a count of vehicles passing the sensor since the last report
-    - ``ACCIDENT``: indicates a count of traffic accidents since the last report
+  - ``VEHICLE``: indicates a count of vehicles passing the sensor since the last report
+  - ``ACCIDENT``: indicates a count of traffic accidents since the last report
       
 - ``count``: ``INT``
 
@@ -453,20 +453,20 @@ Example output::
     YELLOW
     RED
 
-or, using the CDAP CLI:
+or, using the CDAP CLI::
 
   $ cdap-cli.sh call service TrafficApp.TrafficConditions GET 'v1/road/1N1/recent'
   $ cdap-cli.sh call service TrafficApp.TrafficConditions GET 'v1/road/1N2/recent'
   $ cdap-cli.sh call service TrafficApp.TrafficConditions GET 'v1/road/1N3/recent'
 
-+======================================================================================+
-| status        | headers                            | body size      | body           |
-+======================================================================================+
-| 200           | Content-Length : 5                 | 5              | GREEN          |
-|               | Connection : keep-alive            |                |                |
-|               | Content-Type : text/plain; charset |                |                |
-|               | =UTF-8                             |                |                |
-+======================================================================================+
+  +======================================================================================+
+  | status        | headers                            | body size      | body           |
+  +======================================================================================+
+  | 200           | Content-Length : 5                 | 5              | GREEN          |
+  |               | Connection : keep-alive            |                |                |
+  |               | Content-Type : text/plain; charset |                |                |
+  |               | =UTF-8                             |                |                |
+  +======================================================================================+
 
 Congratulations! You have now learned how to incorporate timeseries data
 into your CDAP applications. Please continue to experiment and extend
