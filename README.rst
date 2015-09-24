@@ -425,7 +425,8 @@ If you haven't already started a standalone CDAP installation, start it with the
 
 We can then deploy the application to a standalone CDAP installation::
 
-  $ cdap-cli.sh deploy app target/cdap-timeseries-guide-<version>.jar
+  $ cdap-cli.sh load artifact target/cdap-timeseries-guide-<version>.jar
+  $ cdap-cli.sh create app TrafficApp cdap-timeseries-guide <version> user
   $ cdap-cli.sh start flow TrafficApp.TrafficFlow
 
 Next, we will send some sample records into the stream for processing::
