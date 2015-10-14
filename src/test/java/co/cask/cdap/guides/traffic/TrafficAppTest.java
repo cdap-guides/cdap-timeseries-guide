@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 Cask Data, Inc.
+ * Copyright © 2014-2015 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -19,9 +19,8 @@ package co.cask.cdap.guides.traffic;
 import co.cask.cdap.api.metrics.RuntimeMetrics;
 import co.cask.cdap.test.ApplicationManager;
 import co.cask.cdap.test.FlowManager;
-import co.cask.cdap.test.RuntimeStats;
 import co.cask.cdap.test.ServiceManager;
-import co.cask.cdap.test.StreamWriter;
+import co.cask.cdap.test.StreamManager;
 import co.cask.cdap.test.TestBase;
 import co.cask.common.http.HttpRequest;
 import co.cask.common.http.HttpRequests;
@@ -50,7 +49,8 @@ public class TrafficAppTest extends TestBase {
     ApplicationManager appManager = deployApplication(TrafficApp.class);
 
     // Start the flow
-    FlowManager flowManager = appManager.startFlow(TrafficFlow.FLOW_NAME);
+    FlowManager flowManager = appManager.getFlowManager(TrafficFlow.FLOW_NAME);
+    flowManager.start();
     try {
       String segment1 = "66N_1";
       String segment2 = "66N_2";
@@ -58,34 +58,35 @@ public class TrafficAppTest extends TestBase {
       String segment4 = "66N_4";
 
       // Load some data for querying
-      StreamWriter streamWriter = appManager.getStreamWriter(TrafficApp.STREAM_NAME);
+      StreamManager streamManager = getStreamManager(TrafficApp.STREAM_NAME);
       long now = System.currentTimeMillis();
 
       // Segment 1 only has entries below the threshold (threshold is 100)
-      sendRecord(streamWriter, segment1, now - TrafficApp.TIMESERIES_INTERVAL, TrafficEvent.Type.VEHICLE, 10);
-      sendRecord(streamWriter, segment1, now, TrafficEvent.Type.VEHICLE, 10);
+      sendRecord(streamManager, segment1, now - TrafficApp.TIMESERIES_INTERVAL, TrafficEvent.Type.VEHICLE, 10);
+      sendRecord(streamManager, segment1, now, TrafficEvent.Type.VEHICLE, 10);
 
       // Segment 2 has one timeseries interval over the threshold
-      sendRecord(streamWriter, segment2, now - (2 * TrafficApp.TIMESERIES_INTERVAL), TrafficEvent.Type.VEHICLE, 101);
-      sendRecord(streamWriter, segment2, now - TrafficApp.TIMESERIES_INTERVAL, TrafficEvent.Type.VEHICLE, 10);
+      sendRecord(streamManager, segment2, now - (2 * TrafficApp.TIMESERIES_INTERVAL), TrafficEvent.Type.VEHICLE, 101);
+      sendRecord(streamManager, segment2, now - TrafficApp.TIMESERIES_INTERVAL, TrafficEvent.Type.VEHICLE, 10);
 
       // Segment 3 has two timeseries intervals over the threshold
-      sendRecord(streamWriter, segment3, now - (2 * TrafficApp.TIMESERIES_INTERVAL), TrafficEvent.Type.VEHICLE, 101);
-      sendRecord(streamWriter, segment3, now - TrafficApp.TIMESERIES_INTERVAL, TrafficEvent.Type.VEHICLE, 10);
+      sendRecord(streamManager, segment3, now - (2 * TrafficApp.TIMESERIES_INTERVAL), TrafficEvent.Type.VEHICLE, 101);
+      sendRecord(streamManager, segment3, now - TrafficApp.TIMESERIES_INTERVAL, TrafficEvent.Type.VEHICLE, 10);
       // summed records for the same timestamp will combine over the threshold of 100
-      sendRecord(streamWriter, segment3, now, TrafficEvent.Type.VEHICLE, 51);
-      sendRecord(streamWriter, segment3, now, TrafficEvent.Type.VEHICLE, 51);
+      sendRecord(streamManager, segment3, now, TrafficEvent.Type.VEHICLE, 51);
+      sendRecord(streamManager, segment3, now, TrafficEvent.Type.VEHICLE, 51);
 
       // Segment 4 has an accident
-      sendRecord(streamWriter, segment4, now - TrafficApp.TIMESERIES_INTERVAL, TrafficEvent.Type.VEHICLE, 10);
-      sendRecord(streamWriter, segment4, now - TrafficApp.TIMESERIES_INTERVAL, TrafficEvent.Type.ACCIDENT, 1);
-      sendRecord(streamWriter, segment4, now, TrafficEvent.Type.VEHICLE, 10);
+      sendRecord(streamManager, segment4, now - TrafficApp.TIMESERIES_INTERVAL, TrafficEvent.Type.VEHICLE, 10);
+      sendRecord(streamManager, segment4, now - TrafficApp.TIMESERIES_INTERVAL, TrafficEvent.Type.ACCIDENT, 1);
+      sendRecord(streamManager, segment4, now, TrafficEvent.Type.VEHICLE, 10);
 
       // Wait until all stream events have been processed by the TrafficEventStore Flowlet
-      RuntimeMetrics metrics = RuntimeStats.getFlowletMetrics(TrafficApp.APP_NAME, TrafficFlow.FLOW_NAME, "sink");
+      RuntimeMetrics metrics = flowManager.getFlowletMetrics("sink");
       metrics.waitForProcessed(streamEventCount, 5, TimeUnit.SECONDS);
 
-      ServiceManager serviceManager = appManager.startService(TrafficConditionService.SERVICE_NAME);
+      ServiceManager serviceManager = appManager.getServiceManager(TrafficConditionService.SERVICE_NAME);
+      serviceManager.start();
       try {
         serviceManager.waitForStatus(true);
         URL url = serviceManager.getServiceURL();
@@ -109,11 +110,11 @@ public class TrafficAppTest extends TestBase {
   /**
    * Sends a record for the given fields to the application's input stream.
    */
-  private void sendRecord(StreamWriter streamWriter, String segment, long timestamp, TrafficEvent.Type type,
+  private void sendRecord(StreamManager streamManager, String segment, long timestamp, TrafficEvent.Type type,
                           int count) throws IOException {
     // Expected format for stream records: <segment>, <timestamp>, <type>, <count>
     String streamFormat = "%s, %s, %s, %d";
-    streamWriter.send(String.format(streamFormat, segment, df.format(new Date(timestamp)), type.name(), count));
+    streamManager.send(String.format(streamFormat, segment, df.format(new Date(timestamp)), type.name(), count));
     streamEventCount++;
   }
 
