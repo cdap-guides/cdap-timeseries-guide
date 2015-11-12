@@ -16,26 +16,21 @@
 
 package co.cask.cdap.guides.traffic;
 
-import co.cask.cdap.api.flow.Flow;
-import co.cask.cdap.api.flow.FlowSpecification;
+import co.cask.cdap.api.flow.AbstractFlow;
 
 /**
  * Simple flow for processing and storing {@link TrafficEvent} records.
  */
-public class TrafficFlow implements Flow {
+public class TrafficFlow extends AbstractFlow {
   static final String FLOW_NAME = "TrafficFlow";
 
   @Override
-  public FlowSpecification configure() {
-    return FlowSpecification.Builder.with()
-      .setName(FLOW_NAME)
-      .setDescription("Reads traffic events from a stream and persists to a timeseries dataset")
-      .withFlowlets()
-        .add("parser", new TrafficEventParser())
-        .add("sink", new TrafficEventSink())
-      .connect()
-        .fromStream(TrafficApp.STREAM_NAME).to("parser")
-        .from("parser").to("sink")
-      .build();
+  public void configure() {
+    setName(FLOW_NAME);
+    setDescription("Reads traffic events from a stream and persists to a timeseries dataset");
+    addFlowlet("parser", new TrafficEventParser());
+    addFlowlet("sink", new TrafficEventSink());
+    connectStream(TrafficApp.STREAM_NAME, "parser");
+    connect("parser", "sink");
   }
 }
