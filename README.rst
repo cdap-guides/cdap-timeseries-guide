@@ -156,24 +156,20 @@ method:
 
 .. code:: java
 
-  public class TrafficFlow implements Flow {
-    public static final String FLOW_NAME = "TrafficFlow";
+  public class TrafficFlow extends AbstractFlow {
+    static final String FLOW_NAME = "TrafficFlow";
 
     @Override
-    public FlowSpecification configure() {
-      return FlowSpecification.Builder.with()
-        .setName(FLOW_NAME)
-        .setDescription("Reads traffic events from a stream and persists to a timeseries dataset")
-        .withFlowlets()
-          .add("parser", new TrafficEventParser())
-          .add("sink", new TrafficEventSink())
-        .connect()
-          .fromStream(TrafficApp.STREAM_NAME).to("parser")
-          .from("parser").to("sink")
-        .build();
+    public void configure() {
+      setName(FLOW_NAME);
+      setDescription("Reads traffic events from a stream and persists to a timeseries dataset");
+      addFlowlet("parser", new TrafficEventParser());
+      addFlowlet("sink", new TrafficEventSink());
+      connectStream(TrafficApp.STREAM_NAME, "parser");
+      connect("parser", "sink");
     }
   }
-
+  
 ``TrafficFlow`` first registers the two `Flowlets 
 <http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/flows-flowlets/flowlets.html>`__
 to be used in the specification, then connects the registered Flowlets
