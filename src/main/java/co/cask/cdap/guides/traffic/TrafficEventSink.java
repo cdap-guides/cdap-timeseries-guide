@@ -37,7 +37,7 @@ public class TrafficEventSink extends AbstractFlowlet {
   public void process(TrafficEvent event) {
     if (event.getCount() > 0) {
       table.increment(Bytes.toBytes(event.getRoadSegmentId()), event.getCount(), event.getTimestamp(),
-                      Bytes.toBytes(event.getType()));
+                      Bytes.toBytes(event.getType().name()));
     } else {
       LOG.info("Skipping event with zero or negative count");
     }

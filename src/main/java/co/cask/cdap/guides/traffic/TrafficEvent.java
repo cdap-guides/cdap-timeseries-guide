@@ -24,10 +24,10 @@ public class TrafficEvent {
 
   private final String roadSegmentId;
   private final long timestamp;
-  private final String type;
+  private final Type type;
   private final int count;
 
-  public TrafficEvent(String roadSegmentId, long timestamp, String type, int count) {
+  public TrafficEvent(String roadSegmentId, long timestamp, Type type, int count) {
     this.roadSegmentId = roadSegmentId;
     this.timestamp = timestamp;
     this.type = type;
@@ -42,22 +42,11 @@ public class TrafficEvent {
     return timestamp;
   }
 
-  public String getType() {
+  public Type getType() {
     return type;
   }
 
   public int getCount() {
     return count;
-  }
-
-
-  @Override
-  public String toString() {
-    return "TrafficEvent{" +
-      "roadSegmentId='" + roadSegmentId + '\'' +
-      ", timestamp=" + timestamp +
-      ", type=" + type +
-      ", count=" + count +
-      '}';
   }
 }
