@@ -94,6 +94,6 @@ public class TrafficEventParser extends AbstractFlowlet {
       return;
     }
 
-    out.emit(new TrafficEvent(parts[0], timestamp, type.toString(), count));
+    out.emit(new TrafficEvent(parts[0], timestamp, type, count));
   }
 }
