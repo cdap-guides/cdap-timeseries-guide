@@ -410,31 +410,31 @@ The ``TrafficApp`` application can be built and packaged using the Apache Maven 
 
   $ mvn clean package
 
-Note that the remaining commands assume that the ``cdap-cli.sh`` script is
+Note that the remaining commands assume that the ``cdap`` script is
 available on your PATH. If this is not the case, please add it::
 
   $ export PATH=$PATH:<CDAP home>/bin
 
 If you haven't already started a standalone CDAP installation, start it with the command::
 
-  $ cdap.sh start
+  $ cdap sdk start
 
 We can then deploy the application to a standalone CDAP installation::
 
-  $ cdap-cli.sh load artifact target/cdap-timeseries-guide-<version>.jar
-  $ cdap-cli.sh create app TrafficApp cdap-timeseries-guide <version> user
-  $ cdap-cli.sh start flow TrafficApp.TrafficFlow
+  $ cdap cli load artifact target/cdap-timeseries-guide-<version>.jar
+  $ cdap cli create app TrafficApp cdap-timeseries-guide <version> user
+  $ cdap cli start flow TrafficApp.TrafficFlow
 
 Next, we will send some sample records into the stream for processing::
 
-  $ cdap-cli.sh send stream trafficEvents \"1N1, now, VEHICLE, 10\"
-  $ cdap-cli.sh send stream trafficEvents \"1N2, now, VEHICLE, 101\"
-  $ cdap-cli.sh send stream trafficEvents \"1N3, now, ACCIDENT, 1\"
+  $ cdap cli send stream trafficEvents \"1N1, now, VEHICLE, 10\"
+  $ cdap cli send stream trafficEvents \"1N2, now, VEHICLE, 101\"
+  $ cdap cli send stream trafficEvents \"1N3, now, ACCIDENT, 1\"
 
 We can now start the TrafficConditions service and check the service
 calls::
 
-  $ cdap-cli.sh start service TrafficApp.TrafficConditions
+  $ cdap cli start service TrafficApp.TrafficConditions
 
 Since the service methods are exposed as a RESTful API, we can check the
 results using the curl command::
@@ -452,9 +452,9 @@ Example output::
 
 or, using the CDAP CLI::
 
-  $ cdap-cli.sh call service TrafficApp.TrafficConditions GET 'v1/road/1N1/recent'
-  $ cdap-cli.sh call service TrafficApp.TrafficConditions GET 'v1/road/1N2/recent'
-  $ cdap-cli.sh call service TrafficApp.TrafficConditions GET 'v1/road/1N3/recent'
+  $ cdap cli call service TrafficApp.TrafficConditions GET 'v1/road/1N1/recent'
+  $ cdap cli call service TrafficApp.TrafficConditions GET 'v1/road/1N2/recent'
+  $ cdap cli call service TrafficApp.TrafficConditions GET 'v1/road/1N3/recent'
 
   +======================================================================================+
   | status        | headers                            | body size      | body           |
@@ -487,7 +487,7 @@ Have a question? Discuss at the `CDAP User Mailing List <https://groups.google.c
 License
 =======
 
-Copyright © 2014-2015 Cask Data, Inc.
+Copyright © 2014-2017 Cask Data, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may
 not use this file except in compliance with the License. You may obtain
