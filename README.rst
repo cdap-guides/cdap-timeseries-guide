@@ -439,7 +439,7 @@ calls::
 Since the service methods are exposed as a RESTful API, we can check the
 results using the curl command::
 
-  $ export SERVICE_URL=http://localhost:10000/v3/namespaces/default/apps/TrafficApp/services/TrafficConditions/methods
+  $ export SERVICE_URL=http://localhost:11015/v3/namespaces/default/apps/TrafficApp/services/TrafficConditions/methods
   $ curl -w'\n' $SERVICE_URL/v1/road/1N1/recent
   $ curl -w'\n' $SERVICE_URL/v1/road/1N2/recent
   $ curl -w'\n' $SERVICE_URL/v1/road/1N3/recent
