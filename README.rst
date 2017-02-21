@@ -13,24 +13,24 @@ What You Will Build
 ===================
 
 This guide will take you through building a simple
-`CDAP application <http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/applications.html>`__
+`CDAP application <http://docs.cask.co/cdap/current/en/developers-manual/building-blocks/applications.html>`__
 to ingest data from a sensor network of traffic monitors, aggregate the
 event counts into a traffic volume per road segment, and query the
 traffic volume over a time period to produce a traffic condition report.
 You will:
 
 - Use a
-  `Stream <http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/streams.html>`__
+  `Stream <http://docs.cask.co/cdap/current/en/developers-manual/building-blocks/streams.html>`__
   to ingest real-time events data;
 - Build a
-  `Flow <http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/flows-flowlets/flows.html>`__
+  `Flow <http://docs.cask.co/cdap/current/en/developers-manual/building-blocks/flows-flowlets/index.html>`__
   to process events as they are received, and count by road segment and
   event type;
 - Use a
-  `Dataset <http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/datasets/index.html>`__
+  `Dataset <http://docs.cask.co/cdap/current/en/developers-manual/building-blocks/datasets/index.html>`__
   to store the event data; and
 - Build a
-  `Service <http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/services.html>`__
+  `Service <http://docs.cask.co/cdap/current/en/developers-manual/building-blocks/services.html>`__
   to retrieve the event counts by time range.
 
 What You Will Need
@@ -38,7 +38,7 @@ What You Will Need
 
 - `JDK 7 or 8 <http://www.oracle.com/technetwork/java/javase/downloads/index.html>`__
 - `Apache Maven 3.1+ <http://maven.apache.org/>`__
-- `CDAP SDK <http://docs.cdap.io/cdap/current/en/developers-manual/getting-started/standalone/index.html>`__
+- `CDAP SDK <http://docs.cask.co/cdap/current/en/developers-manual/getting-started/standalone/index.html>`__
 
 Let’s Build It!
 ===============
@@ -104,7 +104,7 @@ standard Maven project structure for all of the source code files::
 
 The application is identified by the ``TrafficApp`` class. This class extends
 `AbstractApplication 
-<http://docs.cdap.io/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/app/AbstractApplication.html>`__,
+<http://docs.cask.co/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/app/AbstractApplication.html>`__,
 and overrides the ``configure()`` method to define all of the application components:
 
 .. code:: java
@@ -132,22 +132,22 @@ and overrides the ``configure()`` method to define all of the application compon
 
 When it comes to handling time-based events, we need a place to receive
 and process the events themselves. CDAP provides a `real-time stream
-processing system <http://docs.cdap.io/cdap/current/en/dev-guide.html#flows>`__ that
+processing system <http://docs.cask.co/cdap/current/en/developers-manual/building-blocks/flows-flowlets/index.html>`__ that
 is a great match for handling event streams. After first setting
 the application name, our ``TrafficApp`` adds a new
-`Stream <http://docs.cdap.io/cdap/current/en/dev-guide.html#streams>`__.
+`Stream <http://docs.cask.co/cdap/current/en/developers-manual/building-blocks/streams.html>`__.
 
 We also need a place to store the traffic event records that we receive;
 ``TrafficApp`` next creates a Dataset to store the processed data.
 ``TrafficApp`` uses a `CounterTimeseriesTable 
-<http://docs.cdap.io/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/dataset/lib/CounterTimeseriesTable.html>`__,
+<http://docs.cask.co/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/dataset/lib/CounterTimeseriesTable.html>`__,
 which orders data by a key plus a timestamp. This makes it possible to
 efficiently query the reported values for a given time range.
 
 Finally, ``TrafficApp`` adds a
-`Flow <http://docs.cdap.io/cdap/current/en/dev-guide.html#flows>`__ to
+`Flow <http://docs.cask.co/cdap/current/en/developers-manual/building-blocks/flows-flowlets/index.html>`__ to
 process data from the Stream, and a
-`Service <http://docs.cdap.io/cdap/current/en/dev-guide.html#services>`__
+`Service <http://docs.cask.co/cdap/current/en/developers-manual/building-blocks/services.html>`__
 to query the traffic events that have been processed and stored.
 
 The incoming traffic events are processed in two phases, defined in the
@@ -171,7 +171,7 @@ method:
   }
   
 ``TrafficFlow`` first registers the two `Flowlets 
-<http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/flows-flowlets/flowlets.html>`__
+<http://docs.cask.co/cdap/current/en/developers-manual/building-blocks/flows-flowlets/flowlets.html>`__
 to be used in the specification, then connects the registered Flowlets
 into a processing pipeline. The first Flowlet, ``TrafficEventParser``, reads
 raw events from the Stream, parses and validates the individual fields,
@@ -256,7 +256,7 @@ input data, which we expect in the format::
 The ``process()`` method validates each field for the correct type,
 constructs a new ``TrafficEvent`` object, and emits the object to any
 downstream Flowlets using the defined `OutputEmitter 
-<http://docs.cdap.io/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/flow/flowlet/OutputEmitter.html>`__
+<http://docs.cask.co/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/flow/flowlet/OutputEmitter.html>`__
 instance.
 
 The next step in the pipeline is the ``TrafficEventSink`` Flowlet:
@@ -278,13 +278,13 @@ The next step in the pipeline is the ``TrafficEventSink`` Flowlet:
 
 In order to access the ``CounterTimeseriesTable`` used by the application,
 ``TrafficEventSink`` declares a variable with the `\@UseDataSet 
-<http://docs.cdap.io/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/annotation/UseDataSet.html>`__
+<http://docs.cask.co/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/annotation/UseDataSet.html>`__
 annotation and the name used to create the Dataset in ``TrafficApp``. This
 variable will be injected with a reference to the ``CounterTimeseriesTable``
 instance when the Flowlet runs.
 
 ``TrafficEventSink`` also defines a ``process()`` method, annotated with `\@ProcessInput 
-<http://docs.cdap.io/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/annotation/ProcessInput.html>`__,
+<http://docs.cask.co/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/annotation/ProcessInput.html>`__,
 for handling incoming events from ``TrafficEventParser``. Since
 ``TrafficEventParser`` emits ``TrafficEvent`` objects, the process method
 takes an input parameter of the same type. Here, we simply increment a
@@ -410,36 +410,36 @@ The ``TrafficApp`` application can be built and packaged using the Apache Maven 
 
   $ mvn clean package
 
-Note that the remaining commands assume that the ``cdap-cli.sh`` script is
+Note that the remaining commands assume that the ``cdap`` script is
 available on your PATH. If this is not the case, please add it::
 
   $ export PATH=$PATH:<CDAP home>/bin
 
 If you haven't already started a standalone CDAP installation, start it with the command::
 
-  $ cdap.sh start
+  $ cdap sdk start
 
 We can then deploy the application to a standalone CDAP installation::
 
-  $ cdap-cli.sh load artifact target/cdap-timeseries-guide-<version>.jar
-  $ cdap-cli.sh create app TrafficApp cdap-timeseries-guide <version> user
-  $ cdap-cli.sh start flow TrafficApp.TrafficFlow
+  $ cdap cli load artifact target/cdap-timeseries-guide-<version>.jar
+  $ cdap cli create app TrafficApp cdap-timeseries-guide <version> user
+  $ cdap cli start flow TrafficApp.TrafficFlow
 
 Next, we will send some sample records into the stream for processing::
 
-  $ cdap-cli.sh send stream trafficEvents \"1N1, now, VEHICLE, 10\"
-  $ cdap-cli.sh send stream trafficEvents \"1N2, now, VEHICLE, 101\"
-  $ cdap-cli.sh send stream trafficEvents \"1N3, now, ACCIDENT, 1\"
+  $ cdap cli send stream trafficEvents \"1N1, now, VEHICLE, 10\"
+  $ cdap cli send stream trafficEvents \"1N2, now, VEHICLE, 101\"
+  $ cdap cli send stream trafficEvents \"1N3, now, ACCIDENT, 1\"
 
 We can now start the TrafficConditions service and check the service
 calls::
 
-  $ cdap-cli.sh start service TrafficApp.TrafficConditions
+  $ cdap cli start service TrafficApp.TrafficConditions
 
 Since the service methods are exposed as a RESTful API, we can check the
 results using the curl command::
 
-  $ export SERVICE_URL=http://localhost:10000/v3/namespaces/default/apps/TrafficApp/services/TrafficConditions/methods
+  $ export SERVICE_URL=http://localhost:11015/v3/namespaces/default/apps/TrafficApp/services/TrafficConditions/methods
   $ curl -w'\n' $SERVICE_URL/v1/road/1N1/recent
   $ curl -w'\n' $SERVICE_URL/v1/road/1N2/recent
   $ curl -w'\n' $SERVICE_URL/v1/road/1N3/recent
@@ -452,9 +452,9 @@ Example output::
 
 or, using the CDAP CLI::
 
-  $ cdap-cli.sh call service TrafficApp.TrafficConditions GET 'v1/road/1N1/recent'
-  $ cdap-cli.sh call service TrafficApp.TrafficConditions GET 'v1/road/1N2/recent'
-  $ cdap-cli.sh call service TrafficApp.TrafficConditions GET 'v1/road/1N3/recent'
+  $ cdap cli call service TrafficApp.TrafficConditions GET 'v1/road/1N1/recent'
+  $ cdap cli call service TrafficApp.TrafficConditions GET 'v1/road/1N2/recent'
+  $ cdap cli call service TrafficApp.TrafficConditions GET 'v1/road/1N3/recent'
 
   +======================================================================================+
   | status        | headers                            | body size      | body           |
@@ -487,7 +487,7 @@ Have a question? Discuss at the `CDAP User Mailing List <https://groups.google.c
 License
 =======
 
-Copyright © 2014-2015 Cask Data, Inc.
+Copyright © 2014-2017 Cask Data, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may
 not use this file except in compliance with the License. You may obtain
