@@ -23,7 +23,7 @@ You will:
   `Stream <http://docs.cask.co/cdap/current/en/developers-manual/building-blocks/streams.html>`__
   to ingest real-time events data;
 - Build a
-  `Flow <http://docs.cask.co/cdap/current/en/developers-manual/building-blocks/flows-flowlets/flows.html>`__
+  `Flow <http://docs.cask.co/cdap/current/en/developers-manual/building-blocks/flows-flowlets/index.html>`__
   to process events as they are received, and count by road segment and
   event type;
 - Use a
