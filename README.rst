@@ -2,7 +2,7 @@
 Storing Timeseries Data
 =======================
 
-The `Cask Data Application Platform (CDAP) <http://cdap.io>`__ provides a
+The `Cask Data Application Platform (CDAP) <https://cask.co>`__ provides a
 number of pre-packaged Datasets, which make it easy to store and
 retrieve data using best-practices-based implementations of common data
 access patterns. In this guide, you will learn how to process and store
@@ -13,24 +13,24 @@ What You Will Build
 ===================
 
 This guide will take you through building a simple
-`CDAP application <http://docs.cask.co/cdap/current/en/developers-manual/building-blocks/applications.html>`__
+`CDAP application <https://docs.cask.co/cdap/current/en/developers-manual/building-blocks/applications.html>`__
 to ingest data from a sensor network of traffic monitors, aggregate the
 event counts into a traffic volume per road segment, and query the
 traffic volume over a time period to produce a traffic condition report.
 You will:
 
 - Use a
-  `Stream <http://docs.cask.co/cdap/current/en/developers-manual/building-blocks/streams.html>`__
+  `Stream <https://docs.cask.co/cdap/current/en/developers-manual/building-blocks/streams.html>`__
   to ingest real-time events data;
 - Build a
-  `Flow <http://docs.cask.co/cdap/current/en/developers-manual/building-blocks/flows-flowlets/index.html>`__
+  `Flow <https://docs.cask.co/cdap/current/en/developers-manual/building-blocks/flows-flowlets/index.html>`__
   to process events as they are received, and count by road segment and
   event type;
 - Use a
-  `Dataset <http://docs.cask.co/cdap/current/en/developers-manual/building-blocks/datasets/index.html>`__
+  `Dataset <https://docs.cask.co/cdap/current/en/developers-manual/building-blocks/datasets/index.html>`__
   to store the event data; and
 - Build a
-  `Service <http://docs.cask.co/cdap/current/en/developers-manual/building-blocks/services.html>`__
+  `Service <https://docs.cask.co/cdap/current/en/developers-manual/building-blocks/services.html>`__
   to retrieve the event counts by time range.
 
 What You Will Need
@@ -38,7 +38,7 @@ What You Will Need
 
 - `JDK 7 or 8 <http://www.oracle.com/technetwork/java/javase/downloads/index.html>`__
 - `Apache Maven 3.1+ <http://maven.apache.org/>`__
-- `CDAP SDK <http://docs.cask.co/cdap/current/en/developers-manual/getting-started/standalone/index.html>`__
+- `CDAP Local Sandbox <https://docs.cask.co/cdap/current/en/developers-manual/getting-started/local-sandbox/index.html>`__
 
 Let’s Build It!
 ===============
@@ -65,7 +65,7 @@ the following fields:
 
   - ``VEHICLE``: indicates a count of vehicles passing the sensor since the last report
   - ``ACCIDENT``: indicates a count of traffic accidents since the last report
-      
+
 - ``count``: ``INT``
 
 The application consists of the following components:
@@ -103,8 +103,8 @@ standard Maven project structure for all of the source code files::
     ./src/main/java/co/cask/cdap/guides/traffic/TrafficFlow.java
 
 The application is identified by the ``TrafficApp`` class. This class extends
-`AbstractApplication 
-<http://docs.cask.co/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/app/AbstractApplication.html>`__,
+`AbstractApplication
+<https://docs.cask.co/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/app/AbstractApplication.html>`__,
 and overrides the ``configure()`` method to define all of the application components:
 
 .. code:: java
@@ -112,8 +112,8 @@ and overrides the ``configure()`` method to define all of the application compon
   public class TrafficApp extends AbstractApplication {
     public static final String APP_NAME = "TrafficApp";
     public static final String STREAM_NAME = "trafficEvents";
-    public static final String TIMESERIES_TABLE_NAME = "trafficEventTable";   
-    public static final int TIMESERIES_INTERVAL = 15 * 60 * 1000; // 15 minutes 
+    public static final String TIMESERIES_TABLE_NAME = "trafficEventTable";
+    public static final int TIMESERIES_INTERVAL = 15 * 60 * 1000; // 15 minutes
 
     @Override
     public void configure() {
@@ -132,22 +132,22 @@ and overrides the ``configure()`` method to define all of the application compon
 
 When it comes to handling time-based events, we need a place to receive
 and process the events themselves. CDAP provides a `real-time stream
-processing system <http://docs.cask.co/cdap/current/en/developers-manual/building-blocks/flows-flowlets/index.html>`__ that
+processing system <https://docs.cask.co/cdap/current/en/developers-manual/building-blocks/flows-flowlets/index.html>`__ that
 is a great match for handling event streams. After first setting
 the application name, our ``TrafficApp`` adds a new
-`Stream <http://docs.cask.co/cdap/current/en/developers-manual/building-blocks/streams.html>`__.
+`Stream <https://docs.cask.co/cdap/current/en/developers-manual/building-blocks/streams.html>`__.
 
 We also need a place to store the traffic event records that we receive;
 ``TrafficApp`` next creates a Dataset to store the processed data.
-``TrafficApp`` uses a `CounterTimeseriesTable 
-<http://docs.cask.co/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/dataset/lib/CounterTimeseriesTable.html>`__,
+``TrafficApp`` uses a `CounterTimeseriesTable
+<https://docs.cask.co/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/dataset/lib/CounterTimeseriesTable.html>`__,
 which orders data by a key plus a timestamp. This makes it possible to
 efficiently query the reported values for a given time range.
 
 Finally, ``TrafficApp`` adds a
-`Flow <http://docs.cask.co/cdap/current/en/developers-manual/building-blocks/flows-flowlets/index.html>`__ to
+`Flow <https://docs.cask.co/cdap/current/en/developers-manual/building-blocks/flows-flowlets/index.html>`__ to
 process data from the Stream, and a
-`Service <http://docs.cask.co/cdap/current/en/developers-manual/building-blocks/services.html>`__
+`Service <https://docs.cask.co/cdap/current/en/developers-manual/building-blocks/services.html>`__
 to query the traffic events that have been processed and stored.
 
 The incoming traffic events are processed in two phases, defined in the
@@ -169,9 +169,9 @@ method:
       connect("parser", "sink");
     }
   }
-  
-``TrafficFlow`` first registers the two `Flowlets 
-<http://docs.cask.co/cdap/current/en/developers-manual/building-blocks/flows-flowlets/flowlets.html>`__
+
+``TrafficFlow`` first registers the two `Flowlets
+<https://docs.cask.co/cdap/current/en/developers-manual/building-blocks/flows-flowlets/flowlets.html>`__
 to be used in the specification, then connects the registered Flowlets
 into a processing pipeline. The first Flowlet, ``TrafficEventParser``, reads
 raw events from the Stream, parses and validates the individual fields,
@@ -199,7 +199,7 @@ First, let’s look at ``TrafficEventParser`` in more detail:
 .. code:: java
 
   public class TrafficEventParser extends AbstractFlowlet {
-    public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss"; 
+    public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     private final DateFormat df = new SimpleDateFormat(DATE_FORMAT);
 
@@ -213,7 +213,7 @@ First, let’s look at ``TrafficEventParser`` in more detail:
       if (parts.length != 4) {
         metrics.count("event.bad", 1);
         return;
-      } 
+      }
 
       long timestamp;
       try {
@@ -239,7 +239,7 @@ First, let’s look at ``TrafficEventParser`` in more detail:
       } catch (NumberFormatException nfe) {
         metrics.count("event.bad", 1);
         return;
-      } 
+      }
 
       out.emit(new TrafficEvent(parts[0], timestamp, type, count));
     }
@@ -255,8 +255,8 @@ input data, which we expect in the format::
 
 The ``process()`` method validates each field for the correct type,
 constructs a new ``TrafficEvent`` object, and emits the object to any
-downstream Flowlets using the defined `OutputEmitter 
-<http://docs.cask.co/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/flow/flowlet/OutputEmitter.html>`__
+downstream Flowlets using the defined `OutputEmitter
+<https://docs.cask.co/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/flow/flowlet/OutputEmitter.html>`__
 instance.
 
 The next step in the pipeline is the ``TrafficEventSink`` Flowlet:
@@ -277,14 +277,14 @@ The next step in the pipeline is the ``TrafficEventSink`` Flowlet:
   }
 
 In order to access the ``CounterTimeseriesTable`` used by the application,
-``TrafficEventSink`` declares a variable with the `\@UseDataSet 
-<http://docs.cask.co/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/annotation/UseDataSet.html>`__
+``TrafficEventSink`` declares a variable with the `\@UseDataSet
+<https://docs.cask.co/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/annotation/UseDataSet.html>`__
 annotation and the name used to create the Dataset in ``TrafficApp``. This
 variable will be injected with a reference to the ``CounterTimeseriesTable``
 instance when the Flowlet runs.
 
-``TrafficEventSink`` also defines a ``process()`` method, annotated with `\@ProcessInput 
-<http://docs.cask.co/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/annotation/ProcessInput.html>`__,
+``TrafficEventSink`` also defines a ``process()`` method, annotated with `\@ProcessInput
+<https://docs.cask.co/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/annotation/ProcessInput.html>`__,
 for handling incoming events from ``TrafficEventParser``. Since
 ``TrafficEventParser`` emits ``TrafficEvent`` objects, the process method
 takes an input parameter of the same type. Here, we simply increment a
@@ -324,7 +324,7 @@ this query and return a response:
     }
 
     @Path("/v1")
-    public static final class TrafficConditionHandler extends 
+    public static final class TrafficConditionHandler extends
         AbstractHttpServiceHandler {
       private static final int CONGESTED_THRESHOLD = 100;
       private static final long LOOKBACK_PERIOD =
@@ -335,7 +335,7 @@ this query and return a response:
 
       @Path("road/{segment}/recent")
       @GET
-      public void recentConditions(HttpServiceRequest request, 
+      public void recentConditions(HttpServiceRequest request,
                                    HttpServiceResponder responder,
                                    @PathParam("segment") String segmentId) {
         long endTime = System.currentTimeMillis();
@@ -343,7 +343,7 @@ this query and return a response:
 
         Condition currentCondition = Condition.GREEN;
         int accidentEntries =
-          getCountsExceeding(segmentId, startTime, endTime, 
+          getCountsExceeding(segmentId, startTime, endTime,
                              TrafficEvent.Type.ACCIDENT, 0);
         if (accidentEntries > 0) {
           currentCondition = Condition.RED;
@@ -365,7 +365,7 @@ this query and return a response:
                                      TrafficEvent.Type type, long threshold) {
         int count = 0;
         Iterator<CounterTimeseriesTable.Counter> events =
-          table.read(Bytes.toBytes(roadSegmentId), startTime, endTime, 
+          table.read(Bytes.toBytes(roadSegmentId), startTime, endTime,
                      Bytes.toBytes(type.name()));
         while (events.hasNext()) {
           if (events.next().getValue() > threshold) {
@@ -415,11 +415,11 @@ available on your PATH. If this is not the case, please add it::
 
   $ export PATH=$PATH:<CDAP home>/bin
 
-If you haven't already started a standalone CDAP installation, start it with the command::
+If you haven't already started a CDAP Local Sandbox installation, start it with the command::
 
-  $ cdap sdk start
+  $ cdap sandbox start
 
-We can then deploy the application to a standalone CDAP installation::
+We can then deploy the application to a CDAP Local Sandbox installation::
 
   $ cdap cli load artifact target/cdap-timeseries-guide-<version>.jar
   $ cdap cli create app TrafficApp cdap-timeseries-guide <version> user
@@ -443,7 +443,7 @@ results using the curl command::
   $ curl -w'\n' $SERVICE_URL/v1/road/1N1/recent
   $ curl -w'\n' $SERVICE_URL/v1/road/1N2/recent
   $ curl -w'\n' $SERVICE_URL/v1/road/1N3/recent
-  
+
 Example output::
 
     GREEN
@@ -475,7 +475,7 @@ Extend This Example
 
 - Write a MapReduce job to look at traffic volume over the last 30 days
   and store the average traffic volume for each 15 minute time slot in the
-  day into another data set. 
+  day into another data set.
 - Modify the ``TrafficService`` to look at the average traffic volumes and use these to
   identify when traffic is congested.
 
